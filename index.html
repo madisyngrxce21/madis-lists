@@ -22,6 +22,7 @@
     --violet-tint:#EEE6FA;
     --teal:#1EA88F;
     --teal-tint:#DFF5F1;
+    --sky-tint:#DFF3FB;
     --shadow: 0 2px 4px rgba(58,15,39,0.04), 0 10px 24px -14px rgba(58,15,39,0.18);
   }
 
@@ -87,6 +88,7 @@
   .link-card.florida .link-emoji{ background:var(--pink-tint); }
   .link-card.budget .link-emoji{ background:var(--violet-tint); }
   .link-card.fitness .link-emoji{ background:var(--teal-tint); }
+  .link-card.reading .link-emoji{ background:var(--sky-tint); }
 
   .link-info{ flex:1; min-width:0; }
   .link-name{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:17px; margin-bottom:2px; }
@@ -125,6 +127,15 @@
     <div class="link-info">
       <div class="link-name">Plate tracker</div>
       <div class="link-desc">Calories, protein, and weigh-ins</div>
+    </div>
+    <div class="link-arrow">&rarr;</div>
+  </a>
+
+  <a class="link-card reading" href="reading.html">
+    <div class="link-emoji">📚</div>
+    <div class="link-info">
+      <div class="link-name">Reading tracker</div>
+      <div class="link-desc">Shelf goals, ratings, and reading goals</div>
     </div>
     <div class="link-arrow">&rarr;</div>
   </a>
