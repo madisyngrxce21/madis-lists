@@ -99,6 +99,12 @@
     border-radius:8px;
   }
   .edit-title-btn:hover{ opacity:1; background:var(--pink-tint); }
+  .link-name-input{
+    font-family:'Baloo 2', sans-serif; font-weight:700; font-size:17px;
+    color:var(--ink); border:1.5px solid var(--pink); border-radius:8px;
+    padding:1px 6px; min-width:0; width:100%; background:#FFFBFD;
+  }
+  .link-name-input:focus{ outline:none; }
   .link-desc{ font-size:12.5px; color:var(--muted); font-weight:600; }
 
   .link-arrow{ font-size:18px; color:var(--muted); flex-shrink:0; }
@@ -176,23 +182,53 @@
     });
   }
 
+  function startEdit(key, defaultName){
+    const nameEl = document.querySelector(`.link-name[data-key="${key}"]`);
+    if (!nameEl) return;
+    const current = nameEl.textContent;
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "link-name-input";
+    input.value = current;
+    input.maxLength = 40;
+    nameEl.replaceWith(input);
+    input.focus();
+    input.select();
+
+    let committed = false;
+    function commit(){
+      if (committed) return;
+      committed = true;
+      const val = input.value.trim();
+      if (!val || val === defaultName){
+        delete customTitles[key];
+      } else {
+        customTitles[key] = val;
+      }
+      localStorage.setItem(TITLES_KEY, JSON.stringify(customTitles));
+
+      const newNameEl = document.createElement("div");
+      newNameEl.className = "link-name";
+      newNameEl.dataset.key = key;
+      newNameEl.textContent = val || defaultName;
+      input.replaceWith(newNameEl);
+    }
+
+    input.addEventListener("blur", commit);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter"){ e.preventDefault(); input.blur(); }
+      if (e.key === "Escape"){ input.value = current; input.blur(); }
+    });
+    input.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); });
+    input.addEventListener("mousedown", (e) => { e.stopPropagation(); });
+  }
+
   document.querySelectorAll(".edit-title-btn").forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const key = btn.dataset.key;
-      const defaultName = btn.dataset.default;
-      const current = customTitles[key] || defaultName;
-      const next = prompt("Rename this list:", current);
-      if (next === null) return;
-      const trimmed = next.trim();
-      if (!trimmed || trimmed === defaultName){
-        delete customTitles[key];
-      } else {
-        customTitles[key] = trimmed;
-      }
-      localStorage.setItem(TITLES_KEY, JSON.stringify(customTitles));
-      document.querySelector(`.link-name[data-key="${key}"]`).textContent = trimmed || defaultName;
+      startEdit(btn.dataset.key, btn.dataset.default);
     });
   });
 
