@@ -79,26 +79,56 @@
 
       let lastPushedJson = null;
       let gotFirstSnapshot = false;
+      let editedBeforeConnected = false; // a local save happened before Firestore finished loading
+      let dbRef = null;
+      let pendingJson = null; // a save that arrived before dbRef existed
+
+      function sendToFirestore(json) {
+        lastPushedJson = json;
+        if (dbRef) {
+          dbRef
+            .set({ json, updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
+            .catch((err) => console.error("MadiSync push error", storageKey, err));
+        } else {
+          pendingJson = json; // flushed once getDb() resolves, below
+        }
+      }
+
+      MadiSync._pushers = MadiSync._pushers || {};
+      MadiSync._pushers[storageKey] = (json) => {
+        editedBeforeConnected = editedBeforeConnected || !dbRef;
+        sendToFirestore(json);
+      };
 
       getDb()
         .then((db) => {
-          const ref = db.collection("syncs").doc(code).collection("state").doc(storageKey);
+          dbRef = db.collection("syncs").doc(code).collection("state").doc(storageKey);
 
-          ref.onSnapshot(
+          if (pendingJson !== null) {
+            // The user edited (and saved locally) before the connection to
+            // Firestore finished — that edit is newer than whatever's
+            // already in the cloud, so send it now instead of letting the
+            // first snapshot below silently overwrite it.
+            const toSend = pendingJson;
+            pendingJson = null;
+            sendToFirestore(toSend);
+          }
+
+          dbRef.onSnapshot(
             (snap) => {
+              const isFirst = !gotFirstSnapshot;
+              gotFirstSnapshot = true;
+              // On the very first read, a local edit made while we were
+              // still connecting always wins over whatever the cloud
+              // already had — never let it clobber fresh work.
+              if (isFirst && editedBeforeConnected) return;
+
               const localJson = localStorage.getItem(storageKey);
 
               if (!snap.exists) {
-                // Nothing in the cloud yet for this code — seed it with
-                // whatever this device already has locally, once.
-                if (!gotFirstSnapshot && localJson) {
-                  lastPushedJson = localJson;
-                  ref.set({ json: localJson, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-                }
-                gotFirstSnapshot = true;
+                if (localJson) sendToFirestore(localJson);
                 return;
               }
-              gotFirstSnapshot = true;
 
               const data = snap.data();
               if (!data || typeof data.json !== "string") return;
@@ -109,14 +139,6 @@
             },
             (err) => console.error("MadiSync snapshot error", storageKey, err)
           );
-
-          MadiSync._pushers = MadiSync._pushers || {};
-          MadiSync._pushers[storageKey] = (json) => {
-            lastPushedJson = json;
-            ref
-              .set({ json, updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
-              .catch((err) => console.error("MadiSync push error", storageKey, err));
-          };
         })
         .catch((err) => console.error("MadiSync init error", storageKey, err));
     },
