@@ -219,6 +219,16 @@
   .item-row.want .item-status-tag{ background:var(--amber-tint); color:var(--amber-dark); }
   .item-row.reading .item-status-tag{ background:var(--sky-tint); color:var(--sky-dark); }
   .item-row.finished .item-status-tag{ background:var(--teal-tint); color:var(--teal-dark); }
+  .genre-tag{
+    font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:999px; display:inline-block;
+    background:var(--pink-tint); color:var(--pink-dark); margin-top:4px; margin-right:4px;
+  }
+  .genre-filter-row{ display:flex; flex-wrap:wrap; gap:6px; margin:-8px 0 20px; }
+  .genre-pill{
+    display:inline-flex; align-items:center; padding:5px 12px; border-radius:999px; font-size:11.5px;
+    font-weight:700; background:var(--card); color:var(--muted); border:1px solid var(--line); cursor:pointer; white-space:nowrap;
+  }
+  .genre-pill.active{ background:var(--pink-tint); color:var(--pink-dark); border-color:var(--pink-tint); }
 
   .overlay{
     position:fixed; inset:0;
@@ -309,6 +319,7 @@
   </div>
 
   <div class="filter-row" id="filterRow"></div>
+  <div class="genre-filter-row" id="genreFilterRow"></div>
 
   <button class="add-btn" id="openAddBtn">+ Add book</button>
 
@@ -351,6 +362,9 @@
 
     <label class="field-label">Author</label>
     <input class="field" type="text" placeholder="Author" id="editAuthor">
+
+    <label class="field-label">Genre</label>
+    <input class="field" type="text" placeholder="e.g. Mystery" id="editGenre" list="genreOptions">
 
     <label class="field-label">Status</label>
     <select class="field" id="editStatus">
@@ -395,6 +409,9 @@
     <label class="field-label">Author</label>
     <input class="field" type="text" placeholder="Author" id="newAuthor">
 
+    <label class="field-label">Genre</label>
+    <input class="field" type="text" placeholder="e.g. Mystery" id="newGenre" list="genreOptions">
+
     <label class="field-label">Status</label>
     <select class="field" id="newStatus">
       <option value="want">📝 Want to read</option>
@@ -413,6 +430,51 @@
     </div>
   </div>
 </div>
+
+<datalist id="genreOptions">
+  <option value="Fantasy">
+  <option value="Mystery">
+  <option value="Horror">
+  <option value="Thriller">
+  <option value="Crime">
+  <option value="Romance">
+  <option value="Smut">
+  <option value="Erotica">
+  <option value="Sci-fi">
+  <option value="Dystopian">
+  <option value="Paranormal">
+  <option value="Fiction">
+  <option value="Literary fiction">
+  <option value="Historical fiction">
+  <option value="Contemporary">
+  <option value="Adventure">
+  <option value="Western">
+  <option value="War">
+  <option value="Humor">
+  <option value="Short stories">
+  <option value="History">
+  <option value="Memoir">
+  <option value="Biography">
+  <option value="Nonfiction">
+  <option value="Self-help">
+  <option value="Health & wellness">
+  <option value="Business">
+  <option value="Philosophy">
+  <option value="Politics">
+  <option value="Science">
+  <option value="Religion & spirituality">
+  <option value="True crime">
+  <option value="Classics">
+  <option value="Young adult">
+  <option value="Middle grade">
+  <option value="Poetry">
+  <option value="Essays">
+  <option value="Graphic novel">
+  <option value="Cookbook">
+  <option value="Travel">
+  <option value="Art">
+  <option value="LGBTQ+">
+</datalist>
 
 <div class="overlay" id="goalOverlay">
   <div class="sheet">
@@ -451,6 +513,7 @@ let books = [];
 let goal = 20;
 let weeklyBooksGoal = 1;
 let activeFilter = "all";
+let activeGenreFilter = "all";
 let activeBookId = null;
 let editStarValue = 0;
 
@@ -523,6 +586,27 @@ function renderFilterRow(){
   });
 }
 
+function renderGenreFilterRow(){
+  const row = document.getElementById("genreFilterRow");
+  row.innerHTML = "";
+  const genres = Array.from(new Set(books.map(b => b.genre).filter(Boolean))).sort();
+  if (genres.length === 0) return;
+
+  const allPill = document.createElement("div");
+  allPill.className = "genre-pill" + (activeGenreFilter === "all" ? " active" : "");
+  allPill.textContent = "All genres";
+  allPill.addEventListener("click", () => { activeGenreFilter = "all"; render(); });
+  row.appendChild(allPill);
+
+  genres.forEach(genre => {
+    const pill = document.createElement("div");
+    pill.className = "genre-pill" + (activeGenreFilter === genre ? " active" : "");
+    pill.textContent = genre;
+    pill.addEventListener("click", () => { activeGenreFilter = genre; render(); });
+    row.appendChild(pill);
+  });
+}
+
 function renderItemList(){
   const wrap = document.getElementById("itemListWrap");
   const listEl = document.createElement("div");
@@ -530,7 +614,11 @@ function renderItemList(){
   let totalShown = 0;
 
   Object.keys(STATUS).forEach(statusKey => {
-    const list = books.filter(b => b.status === statusKey && (activeFilter === "all" || activeFilter === statusKey));
+    const list = books.filter(b =>
+      b.status === statusKey &&
+      (activeFilter === "all" || activeFilter === statusKey) &&
+      (activeGenreFilter === "all" || b.genre === activeGenreFilter)
+    );
     if (list.length === 0) return;
     if (activeFilter === "all"){
       const label = document.createElement("div");
@@ -550,6 +638,7 @@ function renderItemList(){
         <div class="item-info">
           <div class="item-name">${book.title}</div>
           <div class="item-meta">${metaBits.join(" · ")}</div>
+          ${book.genre ? `<span class="genre-tag">${book.genre}</span>` : ""}
         </div>
         <div class="item-right">
           ${statusKey === "finished" ? `<div class="item-stars">${starString(book.rating)}</div>` : `<span class="item-status-tag">${STATUS[statusKey].label}</span>`}
@@ -594,6 +683,7 @@ function render(){
   document.getElementById("weekBooksBar").style.width = booksPct + "%";
 
   renderFilterRow();
+  renderGenreFilterRow();
   renderItemList();
   saveState();
 }
@@ -619,6 +709,7 @@ function openEditSheet(bookId){
   document.getElementById("sheetSub").textContent = STATUS[book.status].label;
   document.getElementById("editTitle").value = book.title;
   document.getElementById("editAuthor").value = book.author || "";
+  document.getElementById("editGenre").value = book.genre || "";
   document.getElementById("editStatus").value = book.status;
   document.getElementById("editPages").value = book.pages || "";
   document.getElementById("editFinishedDate").value = book.finishedDate || "";
@@ -654,6 +745,7 @@ document.getElementById("saveEditBtn").addEventListener("click", () => {
   const newStatus = document.getElementById("editStatus").value;
   book.title = title;
   book.author = document.getElementById("editAuthor").value.trim();
+  book.genre = document.getElementById("editGenre").value.trim();
   book.status = newStatus;
   book.pages = parseInt(document.getElementById("editPages").value) || 0;
   book.finishedDate = document.getElementById("editFinishedDate").value || "";
@@ -673,6 +765,7 @@ document.getElementById("deleteBtn").addEventListener("click", () => {
 document.getElementById("openAddBtn").addEventListener("click", () => {
   document.getElementById("newTitle").value = "";
   document.getElementById("newAuthor").value = "";
+  document.getElementById("newGenre").value = "";
   document.getElementById("newStatus").value = activeFilter !== "all" ? activeFilter : "want";
   document.getElementById("newPages").value = "";
   document.getElementById("newError").style.display = "none";
@@ -691,6 +784,7 @@ document.getElementById("addOverlay").addEventListener("click", (e) => {
 document.getElementById("addSaveBtn").addEventListener("click", () => {
   const title = document.getElementById("newTitle").value.trim();
   const author = document.getElementById("newAuthor").value.trim();
+  const genre = document.getElementById("newGenre").value.trim();
   const status = document.getElementById("newStatus").value;
   const pages = parseInt(document.getElementById("newPages").value) || 0;
   const errorEl = document.getElementById("newError");
@@ -703,7 +797,7 @@ document.getElementById("addSaveBtn").addEventListener("click", () => {
 
   const id = "book_" + Date.now();
   books.unshift({
-    id, title, author, status, pages,
+    id, title, author, genre, status, pages,
     rating: 0,
     finishedDate: status === "finished" ? todayStr() : "",
     notes: "",
