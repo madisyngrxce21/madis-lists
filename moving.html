@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Florida Move List</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap');
+
+  :root{
+    --bg-top:#FFF1F6;
+    --bg-bottom:#FFF8EE;
+    --card:#FFFFFF;
+    --ink:#3A2233;
+    --muted:#9C7E92;
+    --line:#F6E3ED;
+    --pink:#F0407A;
+    --pink-dark:#C22A5E;
+    --pink-tint:#FDE4ED;
+    --pink-deep:#3A0F27;
+    --violet:#8A5FCF;
+    --violet-dark:#5F3EA0;
+    --violet-tint:#EEE6FA;
+    --teal:#1EA88F;
+    --teal-dark:#137A66;
+    --teal-tint:#DFF5F1;
+    --green:#39B383;
+    --green-dark:#22855F;
+    --green-tint:#DEF6EB;
+    --amber:#F0A63C;
+    --amber-dark:#C77D14;
+    --amber-tint:#FCEED9;
+    --plum:#9A5FC2;
+    --plum-dark:#6E3E96;
+    --plum-tint:#F1E6FA;
+    --sky:#3CA9D6;
+    --sky-dark:#217CA3;
+    --sky-tint:#DFF3FB;
+    --shadow: 0 2px 4px rgba(58,15,39,0.04), 0 10px 24px -14px rgba(58,15,39,0.18);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 55%);
+    font-family:'Nunito',sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:32px 16px 64px;
+  }
+
+  .phone{ width:100%; max-width:460px; }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--pink-tint);
+    color:var(--pink-dark);
+    font-weight:700;
+    font-size:12.5px;
+    padding:6px 14px;
+    border-radius:999px;
+    margin-bottom:12px;
+  }
+
+  h1.title{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:34px;
+    letter-spacing:-0.01em;
+    margin:0 0 6px;
+    color:var(--pink);
+  }
+
+  .subtitle{ color:var(--muted); font-size:14px; margin:0 0 22px; font-weight:600; }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .stat-card{
+    background:var(--card);
+    border-radius:18px;
+    padding:14px 16px;
+    box-shadow:var(--shadow);
+  }
+  .stat-label{ font-size:11.5px; font-weight:700; color:var(--muted); margin-bottom:4px; }
+  .stat-value{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:21px; color:var(--pink-deep); }
+
+  .filter-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:9px 16px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:700;
+    background:var(--card);
+    color:var(--ink);
+    border:1px solid var(--line);
+    cursor:pointer;
+    transition:all .15s ease;
+    white-space:nowrap;
+  }
+  .pill:hover{ border-color:var(--pink); }
+  .pill.active{
+    background:var(--pink-deep);
+    color:white;
+    border-color:var(--pink-deep);
+  }
+
+  .add-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--pink);
+    color:white;
+    font-weight:700;
+    font-size:13.5px;
+    border:none;
+    border-radius:999px;
+    padding:11px 20px;
+    cursor:pointer;
+    box-shadow:0 6px 16px -6px rgba(240,64,122,0.55);
+    margin-bottom:20px;
+    width:100%;
+    justify-content:center;
+  }
+  .add-btn:hover{ background:var(--pink-dark); }
+
+  .card-panel{
+    background:var(--card);
+    border-radius:20px;
+    padding:18px;
+    box-shadow:var(--shadow);
+    margin-bottom:18px;
+  }
+
+  .panel-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:2px;
+  }
+  .panel-big{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:22px; }
+  .panel-sub-right{ font-size:12.5px; color:var(--muted); font-weight:700; }
+  .panel-caption{ font-size:12.5px; color:var(--muted); margin:0 0 12px; font-weight:600; }
+
+  .bar-track{
+    height:10px;
+    border-radius:6px;
+    background:var(--line);
+    overflow:hidden;
+    display:flex;
+    margin-bottom:12px;
+  }
+  .bar-seg{ height:100%; }
+
+  .legend{ display:flex; gap:10px; flex-wrap:wrap; font-size:11px; color:var(--muted); font-weight:700; }
+  .legend span.dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
+
+  .empty-state{
+    text-align:center;
+    padding:50px 20px;
+    color:var(--muted);
+    font-weight:700;
+    font-size:14.5px;
+  }
+
+  .item-list{ display:flex; flex-direction:column; gap:10px; }
+  .group-label{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    margin:14px 0 2px;
+  }
+  .group-label:first-child{ margin-top:0; }
+  .group-label.kitchen{ color:var(--pink-dark); }
+  .group-label.bathroom{ color:var(--sky-dark); }
+  .group-label.living{ color:var(--amber-dark); }
+  .group-label.bedroom{ color:var(--violet-dark); }
+  .group-label.outdoor{ color:var(--green-dark); }
+  .group-label.gameroom{ color:var(--plum-dark); }
+  .group-label.misc{ color:var(--teal-dark); }
+
+  .item-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--card);
+    border-radius:16px;
+    padding:12px 14px;
+    box-shadow:var(--shadow);
+    border:1px solid transparent;
+    transition:border-color .15s ease, transform .1s ease;
+  }
+  .item-row:hover{ border-color:var(--line); }
+  .item-row.bought{ opacity:0.55; }
+
+  .item-check{
+    width:20px; height:20px; flex-shrink:0; cursor:pointer; accent-color:var(--pink);
+  }
+
+  .item-emoji{
+    width:34px; height:34px; border-radius:11px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; flex-shrink:0;
+  }
+  .item-row.kitchen .item-emoji{ background:var(--pink-tint); }
+  .item-row.bathroom .item-emoji{ background:var(--sky-tint); }
+  .item-row.living .item-emoji{ background:var(--amber-tint); }
+  .item-row.bedroom .item-emoji{ background:var(--violet-tint); }
+  .item-row.outdoor .item-emoji{ background:var(--green-tint); }
+  .item-row.gameroom .item-emoji{ background:var(--plum-tint); }
+  .item-row.misc .item-emoji{ background:var(--teal-tint); }
+
+  .item-info{ flex:1; min-width:0; cursor:pointer; }
+  .item-name{ font-weight:700; font-size:14px; }
+  .item-name.bought{ text-decoration:line-through; }
+  .item-name a{ color:inherit; text-decoration:none; }
+  .item-name a:hover{ text-decoration:underline; }
+  .item-meta{ font-size:12px; color:var(--muted); font-weight:600; }
+
+  .item-amt{ font-weight:800; font-size:14.5px; color:var(--pink-deep); white-space:nowrap; }
+
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(58,15,39,0.35);
+    display:none; align-items:flex-end; justify-content:center;
+    z-index:10;
+  }
+  .overlay.open{ display:flex; }
+
+  .sheet{
+    background:var(--card);
+    width:100%; max-width:460px;
+    border-radius:26px 26px 0 0;
+    padding:24px 22px 28px;
+    box-shadow:0 -8px 30px rgba(58,15,39,0.2);
+    max-height:88vh;
+    overflow-y:auto;
+  }
+
+  .sheet-head{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .sheet-emoji{
+    width:40px; height:40px; border-radius:13px;
+    display:flex; align-items:center; justify-content:center; font-size:19px;
+  }
+  .sheet-title{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:19px; color:var(--pink-deep); }
+  .sheet-sub{ font-size:12.5px; color:var(--muted); font-weight:600; }
+
+  .field-label{ font-size:12.5px; color:var(--muted); font-weight:700; margin:14px 0 6px; display:block; }
+  .field{
+    width:100%;
+    border:1.5px solid var(--line);
+    border-radius:14px;
+    padding:12px 14px;
+    font-size:15px;
+    font-family:'Nunito',sans-serif;
+    font-weight:600;
+    background:#FFFBFD;
+  }
+  .field:focus{ outline:none; border-color:var(--pink); }
+
+  .row2{ display:flex; gap:10px; }
+  .row2 .field-wrap{ flex:1; }
+
+  .btn-row{ display:flex; gap:10px; margin-top:20px; }
+  .btn{
+    flex:1; border:none; border-radius:14px; padding:13px;
+    font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer;
+  }
+  .btn-primary{ background:var(--pink); color:white; }
+  .btn-primary:hover{ background:var(--pink-dark); }
+  .btn-secondary{ background:var(--pink-tint); color:var(--pink-dark); }
+  .btn-secondary:hover{ background:#F9D3E2; }
+  .btn-danger{ background:#FBE3DE; color:#B5432C; }
+  .btn-danger:hover{ background:#F5CCC3; }
+
+  .error-text{ color:#C43A3A; font-size:12px; margin-top:6px; display:none; font-weight:700; }
+
+  .back-link{ display:inline-block; margin-bottom:16px; font-size:13px; font-weight:700; color:var(--muted); text-decoration:none; }
+  .back-link:hover{ color:var(--pink-dark); }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <a class="back-link" href="index.html">&larr; All lists</a>
+  <div class="eyebrow">🌴 new place, new stuff 🌴</div>
+  <h1 class="title">Florida move list ✨</h1>
+  <p class="subtitle">Everything you're planning to buy, sorted by room.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Items</div>
+      <div class="stat-value" id="statCount">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Bought</div>
+      <div class="stat-value" id="statBought">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Planned total</div>
+      <div class="stat-value" id="statPlanned">$0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Spent so far</div>
+      <div class="stat-value" id="statSpent">$0</div>
+    </div>
+  </div>
+
+  <div class="filter-row" id="filterRow"></div>
+
+  <button class="add-btn" id="openAddBtn">+ Add item</button>
+
+  <div class="card-panel">
+    <div class="panel-top">
+      <span class="panel-big" id="totalSpent">$0.00 spent</span>
+      <span class="panel-sub-right" id="totalPlanned">of $0.00</span>
+    </div>
+    <p class="panel-caption">across every room</p>
+    <div class="bar-track" id="barTrack"></div>
+    <div class="legend" id="legendRow"></div>
+  </div>
+
+  <div id="itemListWrap"></div>
+</div>
+
+<div class="overlay" id="editOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="sheet-emoji" id="sheetEmoji"></div>
+      <div>
+        <div class="sheet-title" id="sheetTitle"></div>
+        <div class="sheet-sub" id="sheetSub"></div>
+      </div>
+    </div>
+
+    <label class="field-label" style="margin-top:0;">Name</label>
+    <input class="field" type="text" placeholder="Item name" id="editName">
+    <div class="error-text" id="editNameError">Give it a name.</div>
+
+    <label class="field-label">Link (optional)</label>
+    <input class="field" type="text" placeholder="https://..." id="editUrl">
+
+    <div class="row2">
+      <div class="field-wrap">
+        <label class="field-label">Price</label>
+        <input class="field" type="number" step="0.01" placeholder="0.00" id="editPrice">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Category</label>
+        <select class="field" id="editCategory"></select>
+      </div>
+    </div>
+    <div class="error-text" id="editPriceError">Price can't be negative.</div>
+
+    <div class="btn-row">
+      <button class="btn btn-danger" id="deleteBtn">Delete</button>
+      <button class="btn btn-primary" id="saveEditBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="addOverlay">
+  <div class="sheet">
+    <div class="sheet-title" style="margin-bottom:16px;">Add item</div>
+
+    <label class="field-label" style="margin-top:0;">Category</label>
+    <select class="field" id="newCategory"></select>
+
+    <label class="field-label">Name</label>
+    <input class="field" type="text" placeholder="e.g. Nightstand" id="newName">
+
+    <label class="field-label">Link (optional)</label>
+    <input class="field" type="text" placeholder="https://..." id="newUrl">
+
+    <label class="field-label">Price</label>
+    <input class="field" type="number" step="0.01" placeholder="0.00" id="newPrice">
+
+    <div class="error-text" id="newError">Give it a name at least.</div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="addCancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="addSaveBtn">Add to list</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATEGORIES = {
+  kitchen:  { label:"Kitchen",      emoji:"🍽️" },
+  bathroom: { label:"Bathroom",     emoji:"🛁" },
+  living:   { label:"Living room",  emoji:"🛋️" },
+  bedroom:  { label:"Bedroom",      emoji:"🌸" },
+  outdoor:  { label:"Outdoor",      emoji:"🌴" },
+  gameroom: { label:"Game room",    emoji:"🎮" },
+  misc:     { label:"Misc",         emoji:"✨" },
+};
+
+const colorMap = {
+  kitchen:"var(--pink)", bathroom:"var(--sky)", living:"var(--amber)",
+  bedroom:"var(--violet)", outdoor:"var(--green)", gameroom:"var(--plum)", misc:"var(--teal)",
+};
+const tintMap = {
+  kitchen:"var(--pink-tint)", bathroom:"var(--sky-tint)", living:"var(--amber-tint)",
+  bedroom:"var(--violet-tint)", outdoor:"var(--green-tint)", gameroom:"var(--plum-tint)", misc:"var(--teal-tint)",
+};
+
+let items = [];
+let activeFilter = "all";
+let activeItemId = null;
+
+const STORAGE_KEY = "florida-move-state";
+(function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (Array.isArray(saved.items)) items = saved.items;
+  } catch (e) {
+    console.error("Could not load saved data", e);
+  }
+})();
+
+function saveState(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ items }));
+  } catch (e) {
+    console.error("Could not save data", e);
+  }
+}
+
+function money(n){
+  const v = Number(n) || 0;
+  return "$" + v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function renderFilterRow(){
+  const row = document.getElementById("filterRow");
+  row.innerHTML = "";
+  const allPill = document.createElement("div");
+  allPill.className = "pill" + (activeFilter === "all" ? " active" : "");
+  allPill.textContent = "💖 All";
+  allPill.addEventListener("click", () => { activeFilter = "all"; render(); });
+  row.appendChild(allPill);
+
+  Object.keys(CATEGORIES).forEach(catKey => {
+    if (!items.some(i => i.category === catKey)) return;
+    const cat = CATEGORIES[catKey];
+    const pill = document.createElement("div");
+    pill.className = "pill" + (activeFilter === catKey ? " active" : "");
+    pill.textContent = cat.emoji + " " + cat.label;
+    pill.addEventListener("click", () => { activeFilter = catKey; render(); });
+    row.appendChild(pill);
+  });
+}
+
+function renderLegend(catTotals){
+  const row = document.getElementById("legendRow");
+  row.innerHTML = "";
+  Object.keys(CATEGORIES).forEach(catKey => {
+    if (!catTotals[catKey] || catTotals[catKey].planned <= 0) return;
+    const cat = CATEGORIES[catKey];
+    const span = document.createElement("span");
+    span.innerHTML = `<span class="dot" style="background:${colorMap[catKey]}"></span>${cat.label}`;
+    row.appendChild(span);
+  });
+}
+
+function renderItemList(){
+  const wrap = document.getElementById("itemListWrap");
+  const listEl = document.createElement("div");
+  listEl.className = "item-list";
+  let totalShown = 0;
+
+  const catKeys = Object.keys(CATEGORIES);
+  catKeys.forEach(catKey => {
+    const catItems = items.filter(i => i.category === catKey && (activeFilter === "all" || activeFilter === catKey));
+    if (catItems.length === 0) return;
+    if (activeFilter === "all"){
+      const label = document.createElement("div");
+      label.className = "group-label " + catKey;
+      label.textContent = CATEGORIES[catKey].emoji + " " + CATEGORIES[catKey].label;
+      listEl.appendChild(label);
+    }
+    catItems.forEach(item => {
+      totalShown++;
+      const row = document.createElement("div");
+      row.className = "item-row " + catKey + (item.bought ? " bought" : "");
+
+      const check = document.createElement("input");
+      check.type = "checkbox";
+      check.className = "item-check";
+      check.checked = !!item.bought;
+      check.addEventListener("click", (e) => e.stopPropagation());
+      check.addEventListener("change", () => {
+        item.bought = check.checked;
+        render();
+      });
+
+      const nameHtml = item.url
+        ? `<a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.name}</a>`
+        : item.name;
+
+      const emojiBadge = document.createElement("div");
+      emojiBadge.className = "item-emoji";
+      emojiBadge.textContent = CATEGORIES[catKey].emoji;
+
+      const info = document.createElement("div");
+      info.className = "item-info";
+      info.innerHTML = `<div class="item-name${item.bought ? " bought" : ""}">${nameHtml}</div>`;
+      info.addEventListener("click", (e) => {
+        if (e.target.tagName === "A") return;
+        openEditSheet(item.id);
+      });
+
+      const amt = document.createElement("div");
+      amt.className = "item-amt";
+      amt.textContent = item.price ? money(item.price) : "";
+
+      row.appendChild(check);
+      row.appendChild(emojiBadge);
+      row.appendChild(info);
+      row.appendChild(amt);
+      listEl.appendChild(row);
+    });
+  });
+
+  wrap.innerHTML = "";
+  if (totalShown === 0){
+    wrap.innerHTML = `<div class="empty-state">Nothing on the list yet — add the first thing you'll need 🌸</div>`;
+  } else {
+    wrap.appendChild(listEl);
+  }
+}
+
+function render(){
+  let plannedTotal = 0, spentTotal = 0, boughtCount = 0;
+  const catTotals = {};
+
+  Object.keys(CATEGORIES).forEach(catKey => {
+    const catItems = items.filter(i => i.category === catKey);
+    const planned = catItems.reduce((s,i)=>s+(Number(i.price)||0),0);
+    catTotals[catKey] = { planned };
+    plannedTotal += planned;
+  });
+
+  items.forEach(i => {
+    if (i.bought){
+      boughtCount++;
+      spentTotal += Number(i.price) || 0;
+    }
+  });
+
+  document.getElementById("statCount").textContent = items.length;
+  document.getElementById("statBought").textContent = boughtCount;
+  document.getElementById("statPlanned").textContent = money(plannedTotal);
+  document.getElementById("statSpent").textContent = money(spentTotal);
+
+  document.getElementById("totalSpent").textContent = money(spentTotal) + " spent";
+  document.getElementById("totalPlanned").textContent = "of " + money(plannedTotal);
+
+  const track = document.getElementById("barTrack");
+  track.innerHTML = "";
+  Object.keys(catTotals).forEach(catKey => {
+    const pct = plannedTotal > 0 ? (catTotals[catKey].planned / plannedTotal) * 100 : 0;
+    if (pct <= 0) return;
+    const seg = document.createElement("div");
+    seg.className = "bar-seg";
+    seg.style.width = pct + "%";
+    seg.style.background = colorMap[catKey];
+    track.appendChild(seg);
+  });
+
+  renderLegend(catTotals);
+  renderFilterRow();
+  renderItemList();
+  saveState();
+}
+
+function populateCategorySelect(select, selected){
+  select.innerHTML = "";
+  Object.keys(CATEGORIES).forEach(catKey => {
+    const opt = document.createElement("option");
+    opt.value = catKey;
+    opt.textContent = CATEGORIES[catKey].emoji + " " + CATEGORIES[catKey].label;
+    if (catKey === selected) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+function openEditSheet(itemId){
+  activeItemId = itemId;
+  const item = items.find(i => i.id === itemId);
+  document.getElementById("sheetEmoji").textContent = CATEGORIES[item.category].emoji;
+  document.getElementById("sheetEmoji").style.background = tintMap[item.category];
+  document.getElementById("sheetTitle").textContent = item.name;
+  document.getElementById("sheetSub").textContent = item.bought ? "Bought" : "Not bought yet";
+  document.getElementById("editName").value = item.name;
+  document.getElementById("editUrl").value = item.url || "";
+  document.getElementById("editPrice").value = item.price || "";
+  populateCategorySelect(document.getElementById("editCategory"), item.category);
+  document.getElementById("editNameError").style.display = "none";
+  document.getElementById("editPriceError").style.display = "none";
+  document.getElementById("editOverlay").classList.add("open");
+}
+
+function closeEditSheet(){
+  document.getElementById("editOverlay").classList.remove("open");
+  activeItemId = null;
+}
+
+document.getElementById("editOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "editOverlay") closeEditSheet();
+});
+
+document.getElementById("saveEditBtn").addEventListener("click", () => {
+  const name = document.getElementById("editName").value.trim();
+  const url = document.getElementById("editUrl").value.trim();
+  const price = parseFloat(document.getElementById("editPrice").value) || 0;
+  const category = document.getElementById("editCategory").value;
+  const nameError = document.getElementById("editNameError");
+  const priceError = document.getElementById("editPriceError");
+
+  let hasError = false;
+  if (!name){ nameError.style.display = "block"; hasError = true; } else { nameError.style.display = "none"; }
+  if (price < 0){ priceError.style.display = "block"; hasError = true; } else { priceError.style.display = "none"; }
+  if (hasError) return;
+
+  const item = items.find(i => i.id === activeItemId);
+  item.name = name;
+  item.url = url;
+  item.price = Math.round(price * 100) / 100;
+  item.category = category;
+  closeEditSheet();
+  render();
+});
+
+document.getElementById("deleteBtn").addEventListener("click", () => {
+  items = items.filter(i => i.id !== activeItemId);
+  closeEditSheet();
+  render();
+});
+
+document.getElementById("openAddBtn").addEventListener("click", () => {
+  populateCategorySelect(document.getElementById("newCategory"), activeFilter !== "all" ? activeFilter : "kitchen");
+  document.getElementById("newName").value = "";
+  document.getElementById("newUrl").value = "";
+  document.getElementById("newPrice").value = "";
+  document.getElementById("newError").style.display = "none";
+  document.getElementById("addOverlay").classList.add("open");
+});
+
+function closeAddSheet(){
+  document.getElementById("addOverlay").classList.remove("open");
+}
+
+document.getElementById("addCancelBtn").addEventListener("click", closeAddSheet);
+document.getElementById("addOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "addOverlay") closeAddSheet();
+});
+
+document.getElementById("addSaveBtn").addEventListener("click", () => {
+  const category = document.getElementById("newCategory").value;
+  const name = document.getElementById("newName").value.trim();
+  const url = document.getElementById("newUrl").value.trim();
+  const price = parseFloat(document.getElementById("newPrice").value) || 0;
+  const errorEl = document.getElementById("newError");
+
+  if (!name){
+    errorEl.style.display = "block";
+    return;
+  }
+  errorEl.style.display = "none";
+
+  const id = category + "_" + Date.now();
+  items.unshift({ id, name, url, price: Math.round(price * 100) / 100, category, bought: false });
+  closeAddSheet();
+  render();
+});
+
+render();
+</script>
+
+</body>
+</html>

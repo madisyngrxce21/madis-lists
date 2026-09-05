@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pocket Envelopes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap');
+
+  :root{
+    --bg-top:#FFF1F6;
+    --bg-bottom:#FFF8EE;
+    --card:#FFFFFF;
+    --ink:#3A2233;
+    --muted:#9C7E92;
+    --line:#F6E3ED;
+    --pink:#F0407A;
+    --pink-dark:#C22A5E;
+    --pink-tint:#FDE4ED;
+    --pink-deep:#3A0F27;
+    --violet:#8A5FCF;
+    --violet-dark:#5F3EA0;
+    --violet-tint:#EEE6FA;
+    --teal:#1EA88F;
+    --teal-dark:#137A66;
+    --teal-tint:#DFF5F1;
+    --shadow: 0 2px 4px rgba(58,15,39,0.04), 0 10px 24px -14px rgba(58,15,39,0.18);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 55%);
+    font-family:'Nunito',sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:32px 16px 64px;
+  }
+
+  .phone{ width:100%; max-width:460px; }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--pink-tint);
+    color:var(--pink-dark);
+    font-weight:700;
+    font-size:12.5px;
+    padding:6px 14px;
+    border-radius:999px;
+    margin-bottom:12px;
+  }
+
+  h1.title{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:34px;
+    letter-spacing:-0.01em;
+    margin:0 0 6px;
+    color:var(--pink);
+  }
+
+  .subtitle{ color:var(--muted); font-size:14px; margin:0 0 22px; font-weight:600; }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .stat-card{
+    background:var(--card);
+    border-radius:18px;
+    padding:14px 16px;
+    box-shadow:var(--shadow);
+  }
+  .stat-label{ font-size:11.5px; font-weight:700; color:var(--muted); margin-bottom:4px; }
+  .stat-value{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:21px; color:var(--pink-deep); }
+
+  .filter-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:9px 16px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:700;
+    background:var(--card);
+    color:var(--ink);
+    border:1px solid var(--line);
+    cursor:pointer;
+    transition:all .15s ease;
+    white-space:nowrap;
+  }
+  .pill:hover{ border-color:var(--pink); }
+  .pill.active{
+    background:var(--pink-deep);
+    color:white;
+    border-color:var(--pink-deep);
+  }
+
+  .add-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--pink);
+    color:white;
+    font-weight:700;
+    font-size:13.5px;
+    border:none;
+    border-radius:999px;
+    padding:11px 20px;
+    cursor:pointer;
+    box-shadow:0 6px 16px -6px rgba(240,64,122,0.55);
+    margin-bottom:20px;
+    width:100%;
+    justify-content:center;
+  }
+  .add-btn:hover{ background:var(--pink-dark); }
+
+  .card-panel{
+    background:var(--card);
+    border-radius:20px;
+    padding:18px;
+    box-shadow:var(--shadow);
+    margin-bottom:18px;
+  }
+
+  .panel-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:2px;
+  }
+  .panel-big{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:22px; }
+  .panel-sub-right{ font-size:12.5px; color:var(--muted); font-weight:700; }
+  .panel-caption{ font-size:12.5px; color:var(--muted); margin:0 0 12px; font-weight:600; }
+
+  .bar-track{
+    height:10px;
+    border-radius:6px;
+    background:var(--line);
+    overflow:hidden;
+    display:flex;
+    margin-bottom:12px;
+  }
+  .bar-seg{ height:100%; }
+
+  .legend{ display:flex; gap:12px; flex-wrap:wrap; font-size:11.5px; color:var(--muted); font-weight:700; }
+  .legend span.dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
+
+  .empty-state{
+    text-align:center;
+    padding:50px 20px;
+    color:var(--muted);
+    font-weight:700;
+    font-size:14.5px;
+  }
+
+  .item-list{ display:flex; flex-direction:column; gap:10px; }
+  .group-label{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    margin:14px 0 2px;
+  }
+  .group-label:first-child{ margin-top:0; }
+  .group-label.variable{ color:var(--pink-dark); }
+  .group-label.fixed{ color:var(--violet-dark); }
+  .group-label.saving{ color:var(--teal-dark); }
+
+  .item-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--card);
+    border-radius:16px;
+    padding:12px 14px;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    border:1px solid transparent;
+    transition:border-color .15s ease, transform .1s ease;
+  }
+  .item-row:hover{ border-color:var(--line); }
+  .item-row:active{ transform:scale(0.99); }
+
+  .item-emoji{
+    width:38px; height:38px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; flex-shrink:0;
+  }
+  .item-row.variable .item-emoji{ background:var(--pink-tint); }
+  .item-row.fixed .item-emoji{ background:var(--violet-tint); }
+  .item-row.saving .item-emoji{ background:var(--teal-tint); }
+
+  .item-info{ flex:1; min-width:0; }
+  .item-name{ font-weight:700; font-size:14px; }
+  .item-meta{ font-size:12px; color:var(--muted); font-weight:600; margin-bottom:4px; }
+  .mini-track{ height:5px; border-radius:4px; background:var(--line); overflow:hidden; }
+  .mini-fill{ height:100%; border-radius:4px; }
+  .item-row.variable .mini-fill{ background:var(--pink); }
+  .item-row.fixed .mini-fill{ background:var(--violet); }
+  .item-row.saving .mini-fill{ background:var(--teal); }
+
+  .item-amt{ font-weight:800; font-size:14.5px; color:var(--pink-deep); white-space:nowrap; text-align:right; }
+  .item-amt .of{ display:block; font-size:11px; font-weight:600; color:var(--muted); }
+
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(58,15,39,0.35);
+    display:none; align-items:flex-end; justify-content:center;
+    z-index:10;
+  }
+  .overlay.open{ display:flex; }
+
+  .sheet{
+    background:var(--card);
+    width:100%; max-width:460px;
+    border-radius:26px 26px 0 0;
+    padding:24px 22px 28px;
+    box-shadow:0 -8px 30px rgba(58,15,39,0.2);
+    max-height:88vh;
+    overflow-y:auto;
+  }
+
+  .sheet-head{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .sheet-emoji{
+    width:40px; height:40px; border-radius:13px;
+    display:flex; align-items:center; justify-content:center; font-size:19px;
+  }
+  .sheet-title{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:19px; color:var(--pink-deep); }
+  .sheet-sub{ font-size:12.5px; color:var(--muted); font-weight:600; }
+
+  .field-label{ font-size:12.5px; color:var(--muted); font-weight:700; margin:14px 0 6px; display:block; }
+  .field{
+    width:100%;
+    border:1.5px solid var(--line);
+    border-radius:14px;
+    padding:12px 14px;
+    font-size:15px;
+    font-family:'Nunito',sans-serif;
+    font-weight:600;
+    background:#FFFBFD;
+  }
+  .field:focus{ outline:none; border-color:var(--pink); }
+
+  .row2{ display:flex; gap:10px; }
+  .row2 .field-wrap{ flex:1; }
+
+  .btn-row{ display:flex; gap:10px; margin-top:20px; }
+  .btn{
+    flex:1; border:none; border-radius:14px; padding:13px;
+    font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer;
+  }
+  .btn-primary{ background:var(--pink); color:white; }
+  .btn-primary:hover{ background:var(--pink-dark); }
+  .btn-secondary{ background:var(--pink-tint); color:var(--pink-dark); }
+  .btn-secondary:hover{ background:#F9D3E2; }
+  .btn-danger{ background:#FBE3DE; color:#B5432C; }
+  .btn-danger:hover{ background:#F5CCC3; }
+
+  .error-text{ color:#C43A3A; font-size:12px; margin-top:6px; display:none; font-weight:700; }
+  .divider{ border-top:1.5px dashed var(--line); margin-top:20px; padding-top:16px; }
+  .back-link{ display:inline-block; margin-bottom:16px; font-size:13px; font-weight:700; color:var(--muted); text-decoration:none; }
+  .back-link:hover{ color:var(--pink-dark); }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <a class="back-link" href="index.html">&larr; All lists</a>
+  <div class="eyebrow">💗 new paycheck, new plan 💗</div>
+  <h1 class="title">Pocket envelopes <span>✨</span></h1>
+  <p class="subtitle">Everything you're budgeting, sorted by envelope.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Envelopes</div>
+      <div class="stat-value" id="statCount">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Budgeted</div>
+      <div class="stat-value" id="statBudgeted">$0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Spent</div>
+      <div class="stat-value" id="statSpent">$0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Left to assign</div>
+      <div class="stat-value" id="statLeft">$0</div>
+    </div>
+  </div>
+
+  <div class="filter-row" id="filterRow"></div>
+
+  <button class="add-btn" id="openAddBtn">+ Add envelope</button>
+
+  <div class="card-panel">
+    <div class="panel-top">
+      <span class="panel-big" id="totalSpent">$0.00 spent</span>
+      <span class="panel-sub-right" id="totalBudget">of $0.00</span>
+    </div>
+    <p class="panel-caption">across every envelope</p>
+    <div class="bar-track" id="barTrack"></div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--pink)"></span>Variable</span>
+      <span><span class="dot" style="background:var(--violet)"></span>Fixed</span>
+      <span><span class="dot" style="background:var(--teal)"></span>Saving</span>
+    </div>
+  </div>
+
+  <div class="card-panel">
+    <div class="panel-top">
+      <span class="panel-big" id="totalIncome">$0.00 income</span>
+      <span class="panel-sub-right" id="leftToBudget">of $0.00</span>
+    </div>
+    <p class="panel-caption" id="incomeSub">left to assign to envelopes</p>
+    <button class="btn btn-secondary" id="addPaycheckBtn" style="width:100%;">+ Add paycheck</button>
+  </div>
+
+  <div id="itemListWrap"></div>
+</div>
+
+<div class="overlay" id="editOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="sheet-emoji" id="sheetEmoji"></div>
+      <div>
+        <div class="sheet-title" id="sheetTitle"></div>
+        <div class="sheet-sub" id="sheetSub"></div>
+      </div>
+    </div>
+
+    <label class="field-label" style="margin-top:0;">Log a transaction</label>
+    <input class="field" type="number" step="0.01" placeholder="0.00" id="txAmount">
+    <div class="error-text" id="txError">Enter an amount first.</div>
+
+    <label class="field-label">Note (optional)</label>
+    <input class="field" type="text" placeholder="What was it for?" id="txNote">
+
+    <div class="btn-row">
+      <button class="btn btn-danger" id="deleteEnvBtn">Delete</button>
+      <button class="btn btn-primary" id="saveBtn">Add expense</button>
+    </div>
+
+    <div class="divider">
+      <label class="field-label" style="margin-top:0;">Envelope name</label>
+      <input class="field" type="text" placeholder="Envelope name" id="envNameInput">
+      <div class="error-text" id="nameError">Give the envelope a name.</div>
+
+      <label class="field-label">Envelope budget</label>
+      <input class="field" type="number" step="0.01" placeholder="0.00" id="budgetAmount">
+      <div class="error-text" id="budgetError">Budget can't be negative.</div>
+      <button class="btn btn-secondary" id="budgetSaveBtn" style="width:100%; margin-top:10px;">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="addOverlay">
+  <div class="sheet">
+    <div class="sheet-title" style="margin-bottom:16px;">New envelope</div>
+
+    <label class="field-label" style="margin-top:0;">Category</label>
+    <select class="field" id="newCategory">
+      <option value="variable">💗 Variable</option>
+      <option value="fixed">🔮 Fixed</option>
+      <option value="saving">🌿 Saving</option>
+    </select>
+
+    <label class="field-label">Name</label>
+    <input class="field" type="text" placeholder="e.g. Coffee" id="newName">
+
+    <div class="row2">
+      <div class="field-wrap">
+        <label class="field-label">Emoji</label>
+        <input class="field" type="text" maxlength="2" placeholder="☕" id="newEmoji">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Budget</label>
+        <input class="field" type="number" step="0.01" placeholder="0.00" id="newBudget">
+      </div>
+    </div>
+    <div class="error-text" id="newError">Give it a name and a budget above $0.</div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="addCancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="addSaveBtn">Create envelope</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="paycheckOverlay">
+  <div class="sheet">
+    <div class="sheet-title" style="margin-bottom:16px;">Add paycheck</div>
+
+    <label class="field-label" style="margin-top:0;">Amount</label>
+    <input class="field" type="number" step="0.01" placeholder="0.00" id="paycheckAmount">
+    <div class="error-text" id="paycheckError">Enter an amount first.</div>
+
+    <label class="field-label">Note (optional)</label>
+    <input class="field" type="text" placeholder="e.g. July 15 paycheck" id="paycheckNote">
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="paycheckCancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="paycheckSaveBtn">Add income</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let data = {
+  variable: { label:"Variable", emoji:"💗", envelopes: [] },
+  fixed:    { label:"Fixed", emoji:"🔮", envelopes: [] },
+  saving:   { label:"Saving", emoji:"🌿", envelopes: [] },
+};
+
+let activeCategory = null;
+let activeEnvId = null;
+let addCategory = null;
+let activeFilter = "all";
+let totalIncome = 0;
+
+const STORAGE_KEY = "pocket-envelopes-state";
+(function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (saved.data) data = saved.data;
+    if (typeof saved.totalIncome === "number") totalIncome = saved.totalIncome;
+  } catch (e) {
+    console.error("Could not load saved data", e);
+  }
+})();
+
+function saveState(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ data, totalIncome }));
+  } catch (e) {
+    console.error("Could not save data", e);
+  }
+}
+
+const tintMap = { variable:"var(--pink-tint)", fixed:"var(--violet-tint)", saving:"var(--teal-tint)" };
+const colorMap = { variable:"var(--pink)", fixed:"var(--violet)", saving:"var(--teal)" };
+
+function money(n){
+  return "$" + n.toLocaleString("en-US", { minimumFractionDigits:2, maximumFractionDigits:2 });
+}
+
+function renderFilterRow(){
+  const row = document.getElementById("filterRow");
+  row.innerHTML = "";
+  const options = [{ key:"all", label:"All", emoji:"💌" }, ...Object.keys(data).map(k => ({ key:k, label:data[k].label, emoji:data[k].emoji }))];
+  options.forEach(opt => {
+    const pill = document.createElement("div");
+    pill.className = "pill" + (activeFilter === opt.key ? " active" : "");
+    pill.innerHTML = `${opt.emoji} ${opt.label}`;
+    pill.addEventListener("click", () => {
+      activeFilter = opt.key;
+      renderFilterRow();
+      renderItemList();
+    });
+    row.appendChild(pill);
+  });
+}
+
+function renderItemList(){
+  const wrap = document.getElementById("itemListWrap");
+  const cats = activeFilter === "all" ? Object.keys(data) : [activeFilter];
+  let totalShown = 0;
+
+  const listEl = document.createElement("div");
+  listEl.className = "item-list";
+
+  cats.forEach(catKey => {
+    const cat = data[catKey];
+    if (cat.envelopes.length === 0) return;
+    if (activeFilter === "all"){
+      const label = document.createElement("div");
+      label.className = "group-label " + catKey;
+      label.textContent = cat.emoji + " " + cat.label;
+      listEl.appendChild(label);
+    }
+    cat.envelopes.forEach(env => {
+      totalShown++;
+      const pct = env.budget > 0 ? Math.min(100, (env.spent/env.budget)*100) : 0;
+      const row = document.createElement("div");
+      row.className = "item-row " + catKey;
+      row.innerHTML = `
+        <div class="item-emoji">${env.emoji}</div>
+        <div class="item-info">
+          <div class="item-name">${env.name}</div>
+          <div class="item-meta">of ${money(env.budget)}</div>
+          <div class="mini-track"><div class="mini-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="item-amt">${money(env.spent)}</div>
+      `;
+      row.addEventListener("click", () => openEditSheet(catKey, env.id));
+      listEl.appendChild(row);
+    });
+  });
+
+  wrap.innerHTML = "";
+  if (totalShown === 0){
+    wrap.innerHTML = `<div class="empty-state">Nothing on the list yet — add your first envelope 🌸</div>`;
+  } else {
+    wrap.appendChild(listEl);
+  }
+}
+
+function render(){
+  let grandSpent = 0, grandBudget = 0, grandCount = 0;
+  const catTotals = {};
+
+  Object.keys(data).forEach(catKey => {
+    const cat = data[catKey];
+    const spent = cat.envelopes.reduce((s,e)=>s+e.spent,0);
+    const budget = cat.envelopes.reduce((s,e)=>s+e.budget,0);
+    catTotals[catKey] = { spent, budget };
+    grandSpent += spent;
+    grandBudget += budget;
+    grandCount += cat.envelopes.length;
+  });
+
+  document.getElementById("statCount").textContent = grandCount;
+  document.getElementById("statBudgeted").textContent = money(grandBudget);
+  document.getElementById("statSpent").textContent = money(grandSpent);
+  document.getElementById("statLeft").textContent = money(Math.max(totalIncome - grandBudget, 0));
+
+  document.getElementById("totalSpent").textContent = money(grandSpent) + " spent";
+  document.getElementById("totalBudget").textContent = "of " + money(grandBudget);
+
+  document.getElementById("totalIncome").textContent = money(totalIncome) + " income";
+  const left = totalIncome - grandBudget;
+  document.getElementById("leftToBudget").textContent = money(Math.abs(left)) + (left < 0 ? " over" : " left");
+  document.getElementById("incomeSub").textContent = left < 0
+    ? "envelopes are over your income"
+    : "left to assign to envelopes";
+
+  const track = document.getElementById("barTrack");
+  track.innerHTML = "";
+  Object.keys(catTotals).forEach(catKey => {
+    const pct = grandBudget > 0 ? (catTotals[catKey].spent / grandBudget) * 100 : 0;
+    if (pct <= 0) return;
+    const seg = document.createElement("div");
+    seg.className = "bar-seg";
+    seg.style.width = pct + "%";
+    seg.style.background = colorMap[catKey];
+    track.appendChild(seg);
+  });
+
+  renderFilterRow();
+  renderItemList();
+  saveState();
+}
+
+function openEditSheet(catKey, envId){
+  activeCategory = catKey;
+  activeEnvId = envId;
+  const env = data[catKey].envelopes.find(e => e.id === envId);
+  document.getElementById("sheetEmoji").textContent = env.emoji;
+  document.getElementById("sheetEmoji").style.background = tintMap[catKey];
+  document.getElementById("sheetTitle").textContent = env.name;
+  document.getElementById("sheetSub").textContent = money(env.spent) + " of " + money(env.budget) + " used";
+  document.getElementById("txAmount").value = "";
+  document.getElementById("txNote").value = "";
+  document.getElementById("txError").style.display = "none";
+  document.getElementById("envNameInput").value = env.name;
+  document.getElementById("nameError").style.display = "none";
+  document.getElementById("budgetAmount").value = env.budget;
+  document.getElementById("budgetError").style.display = "none";
+  document.getElementById("editOverlay").classList.add("open");
+}
+
+function closeEditSheet(){
+  document.getElementById("editOverlay").classList.remove("open");
+  activeCategory = null;
+  activeEnvId = null;
+}
+
+document.getElementById("editOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "editOverlay") closeEditSheet();
+});
+
+document.getElementById("saveBtn").addEventListener("click", () => {
+  const amountInput = document.getElementById("txAmount");
+  const amount = parseFloat(amountInput.value);
+  const errorEl = document.getElementById("txError");
+  if (isNaN(amount) || amount <= 0){
+    errorEl.style.display = "block";
+    return;
+  }
+  errorEl.style.display = "none";
+  const env = data[activeCategory].envelopes.find(e => e.id === activeEnvId);
+  env.spent = Math.round((env.spent + amount) * 100) / 100;
+  closeEditSheet();
+  render();
+});
+
+document.getElementById("txAmount").addEventListener("input", () => {
+  document.getElementById("txError").style.display = "none";
+});
+
+document.getElementById("deleteEnvBtn").addEventListener("click", () => {
+  const cat = data[activeCategory];
+  cat.envelopes = cat.envelopes.filter(e => e.id !== activeEnvId);
+  closeEditSheet();
+  render();
+});
+
+document.getElementById("budgetSaveBtn").addEventListener("click", () => {
+  const nameInput = document.getElementById("envNameInput");
+  const newName = nameInput.value.trim();
+  const budgetInput = document.getElementById("budgetAmount");
+  const newBudget = parseFloat(budgetInput.value);
+  const nameError = document.getElementById("nameError");
+  const budgetError = document.getElementById("budgetError");
+
+  let hasError = false;
+  if (!newName){ nameError.style.display = "block"; hasError = true; } else { nameError.style.display = "none"; }
+  if (isNaN(newBudget) || newBudget < 0){ budgetError.style.display = "block"; hasError = true; } else { budgetError.style.display = "none"; }
+  if (hasError) return;
+
+  const env = data[activeCategory].envelopes.find(e => e.id === activeEnvId);
+  env.name = newName;
+  env.budget = Math.round(newBudget * 100) / 100;
+  closeEditSheet();
+  render();
+});
+
+document.getElementById("budgetAmount").addEventListener("input", () => {
+  document.getElementById("budgetError").style.display = "none";
+});
+document.getElementById("envNameInput").addEventListener("input", () => {
+  document.getElementById("nameError").style.display = "none";
+});
+
+document.getElementById("openAddBtn").addEventListener("click", () => {
+  document.getElementById("newCategory").value = activeFilter !== "all" ? activeFilter : "variable";
+  document.getElementById("newName").value = "";
+  document.getElementById("newEmoji").value = "";
+  document.getElementById("newBudget").value = "";
+  document.getElementById("newError").style.display = "none";
+  document.getElementById("addOverlay").classList.add("open");
+});
+
+function closeAddSheet(){
+  document.getElementById("addOverlay").classList.remove("open");
+}
+
+document.getElementById("addCancelBtn").addEventListener("click", closeAddSheet);
+document.getElementById("addOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "addOverlay") closeAddSheet();
+});
+
+document.getElementById("addSaveBtn").addEventListener("click", () => {
+  const category = document.getElementById("newCategory").value;
+  const name = document.getElementById("newName").value.trim();
+  const emoji = document.getElementById("newEmoji").value.trim() || "💵";
+  const budget = parseFloat(document.getElementById("newBudget").value);
+  const errorEl = document.getElementById("newError");
+
+  if (!name || isNaN(budget) || budget <= 0){
+    errorEl.style.display = "block";
+    return;
+  }
+  errorEl.style.display = "none";
+
+  const id = category + "_" + Date.now();
+  data[category].envelopes.push({ id, name, emoji, budget, spent: 0 });
+  closeAddSheet();
+  render();
+});
+
+document.getElementById("addPaycheckBtn").addEventListener("click", () => {
+  document.getElementById("paycheckAmount").value = "";
+  document.getElementById("paycheckNote").value = "";
+  document.getElementById("paycheckError").style.display = "none";
+  document.getElementById("paycheckOverlay").classList.add("open");
+});
+
+function closePaycheckSheet(){
+  document.getElementById("paycheckOverlay").classList.remove("open");
+}
+
+document.getElementById("paycheckCancelBtn").addEventListener("click", closePaycheckSheet);
+document.getElementById("paycheckOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "paycheckOverlay") closePaycheckSheet();
+});
+
+document.getElementById("paycheckSaveBtn").addEventListener("click", () => {
+  const input = document.getElementById("paycheckAmount");
+  const amount = parseFloat(input.value);
+  const errorEl = document.getElementById("paycheckError");
+  if (isNaN(amount) || amount <= 0){
+    errorEl.style.display = "block";
+    return;
+  }
+  errorEl.style.display = "none";
+  totalIncome = Math.round((totalIncome + amount) * 100) / 100;
+  closePaycheckSheet();
+  render();
+});
+
+document.getElementById("paycheckAmount").addEventListener("input", () => {
+  document.getElementById("paycheckError").style.display = "none";
+});
+
+render();
+</script>
+
+</body>
+</html>
