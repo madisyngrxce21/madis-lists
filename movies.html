@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Watchlist Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap');
+
+  :root{
+    --bg-top:#FFF1F6;
+    --bg-bottom:#FFF8EE;
+    --card:#FFFFFF;
+    --ink:#3A2233;
+    --muted:#9C7E92;
+    --line:#F6E3ED;
+    --pink:#F0407A;
+    --pink-dark:#C22A5E;
+    --pink-tint:#FDE4ED;
+    --pink-deep:#3A0F27;
+    --amber:#F0A63C;
+    --amber-dark:#C77D14;
+    --amber-tint:#FCEED9;
+    --sky:#3CA9D6;
+    --sky-dark:#217CA3;
+    --sky-tint:#DFF3FB;
+    --teal:#1EA88F;
+    --teal-dark:#137A66;
+    --teal-tint:#DFF5F1;
+    --gold:#E8B90B;
+    --shadow: 0 2px 4px rgba(58,15,39,0.04), 0 10px 24px -14px rgba(58,15,39,0.18);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 55%);
+    font-family:'Nunito',sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:32px 16px 64px;
+  }
+
+  .phone{ width:100%; max-width:460px; }
+
+  .back-link{ display:inline-block; margin-bottom:16px; font-size:13px; font-weight:700; color:var(--muted); text-decoration:none; }
+  .back-link:hover{ color:var(--pink-dark); }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--pink-tint);
+    color:var(--pink-dark);
+    font-weight:700;
+    font-size:12.5px;
+    padding:6px 14px;
+    border-radius:999px;
+    margin-bottom:12px;
+  }
+
+  h1.title{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:34px;
+    letter-spacing:-0.01em;
+    margin:0 0 6px;
+    color:var(--pink);
+  }
+
+  .subtitle{ color:var(--muted); font-size:14px; margin:0 0 22px; font-weight:600; }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .stat-card{
+    background:var(--card);
+    border-radius:18px;
+    padding:14px 16px;
+    box-shadow:var(--shadow);
+  }
+  .stat-label{ font-size:11.5px; font-weight:700; color:var(--muted); margin-bottom:4px; }
+  .stat-value{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:21px; color:var(--pink-deep); }
+
+  .filter-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:9px 16px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:700;
+    background:var(--card);
+    color:var(--ink);
+    border:1px solid var(--line);
+    cursor:pointer;
+    transition:all .15s ease;
+    white-space:nowrap;
+  }
+  .pill:hover{ border-color:var(--pink); }
+  .pill.active{
+    background:var(--pink-deep);
+    color:white;
+    border-color:var(--pink-deep);
+  }
+
+  .add-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--pink);
+    color:white;
+    font-weight:700;
+    font-size:13.5px;
+    border:none;
+    border-radius:999px;
+    padding:11px 20px;
+    cursor:pointer;
+    box-shadow:0 6px 16px -6px rgba(240,64,122,0.55);
+    margin-bottom:20px;
+    width:100%;
+    justify-content:center;
+  }
+  .add-btn:hover{ background:var(--pink-dark); }
+
+  .card-panel{
+    background:var(--card);
+    border-radius:20px;
+    padding:18px;
+    box-shadow:var(--shadow);
+    margin-bottom:18px;
+  }
+
+  .panel-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:2px;
+  }
+  .panel-big{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:22px; }
+  .panel-sub-right{ font-size:12.5px; color:var(--muted); font-weight:700; cursor:pointer; }
+  .panel-sub-right:hover{ color:var(--pink-dark); }
+  .panel-caption{ font-size:12.5px; color:var(--muted); margin:0 0 12px; font-weight:600; }
+
+  .bar-track{
+    height:10px;
+    border-radius:6px;
+    background:var(--line);
+    overflow:hidden;
+    display:flex;
+    margin-bottom:2px;
+  }
+  .bar-seg{ height:100%; background:var(--pink); transition:width .2s ease; }
+
+  .empty-state{
+    text-align:center;
+    padding:50px 20px;
+    color:var(--muted);
+    font-weight:700;
+    font-size:14.5px;
+  }
+
+  .item-list{ display:flex; flex-direction:column; gap:10px; }
+  .group-label{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    margin:14px 0 2px;
+  }
+  .group-label:first-child{ margin-top:0; }
+  .group-label.want{ color:var(--amber-dark); }
+  .group-label.reading{ color:var(--sky-dark); }
+  .group-label.finished{ color:var(--teal-dark); }
+
+  .item-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--card);
+    border-radius:16px;
+    padding:12px 14px;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    border:1px solid transparent;
+    transition:border-color .15s ease, transform .1s ease;
+  }
+  .item-row:hover{ border-color:var(--line); }
+  .item-row:active{ transform:scale(0.99); }
+
+  .item-emoji{
+    width:38px; height:38px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; flex-shrink:0;
+  }
+  .item-row.want .item-emoji{ background:var(--amber-tint); }
+  .item-row.reading .item-emoji{ background:var(--sky-tint); }
+  .item-row.finished .item-emoji{ background:var(--teal-tint); }
+
+  .item-info{ flex:1; min-width:0; }
+  .item-name{ font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .item-meta{ font-size:12px; color:var(--muted); font-weight:600; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .item-right{ text-align:right; flex-shrink:0; }
+  .item-stars{ font-size:12px; color:var(--gold); letter-spacing:1px; }
+  .item-status-tag{
+    font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:999px; display:inline-block; margin-top:4px;
+  }
+  .item-row.want .item-status-tag{ background:var(--amber-tint); color:var(--amber-dark); }
+  .item-row.reading .item-status-tag{ background:var(--sky-tint); color:var(--sky-dark); }
+  .item-row.finished .item-status-tag{ background:var(--teal-tint); color:var(--teal-dark); }
+  .genre-tag{
+    font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:999px; display:inline-block;
+    background:var(--pink-tint); color:var(--pink-dark); margin-top:4px; margin-right:4px;
+  }
+  .genre-filter-row{ display:flex; flex-wrap:wrap; gap:6px; margin:-8px 0 20px; }
+  .genre-pill{
+    display:inline-flex; align-items:center; padding:5px 12px; border-radius:999px; font-size:11.5px;
+    font-weight:700; background:var(--card); color:var(--muted); border:1px solid var(--line); cursor:pointer; white-space:nowrap;
+  }
+  .genre-pill.active{ background:var(--pink-tint); color:var(--pink-dark); border-color:var(--pink-tint); }
+
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(58,15,39,0.35);
+    display:none; align-items:flex-end; justify-content:center;
+    z-index:10;
+  }
+  .overlay.open{ display:flex; }
+
+  .sheet{
+    background:var(--card);
+    width:100%; max-width:460px;
+    border-radius:26px 26px 0 0;
+    padding:24px 22px 28px;
+    box-shadow:0 -8px 30px rgba(58,15,39,0.2);
+    max-height:88vh;
+    overflow-y:auto;
+  }
+
+  .sheet-head{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .sheet-emoji{
+    width:40px; height:40px; border-radius:13px;
+    display:flex; align-items:center; justify-content:center; font-size:19px;
+  }
+  .sheet-title{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:19px; color:var(--pink-deep); }
+  .sheet-sub{ font-size:12.5px; color:var(--muted); font-weight:600; }
+
+  .field-label{ font-size:12.5px; color:var(--muted); font-weight:700; margin:14px 0 6px; display:block; }
+  .field{
+    width:100%;
+    border:1.5px solid var(--line);
+    border-radius:14px;
+    padding:12px 14px;
+    font-size:15px;
+    font-family:'Nunito',sans-serif;
+    font-weight:600;
+    background:#FFFBFD;
+  }
+  .field:focus{ outline:none; border-color:var(--pink); }
+
+  .row2{ display:flex; gap:10px; }
+  .row2 .field-wrap{ flex:1; }
+
+  .star-picker{ display:flex; gap:6px; margin-top:6px; }
+  .star-picker span{ font-size:26px; cursor:pointer; color:var(--line); }
+  .star-picker span.filled{ color:var(--gold); }
+
+  .btn-row{ display:flex; gap:10px; margin-top:20px; }
+  .btn{
+    flex:1; border:none; border-radius:14px; padding:13px;
+    font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer;
+  }
+  .btn-primary{ background:var(--pink); color:white; }
+  .btn-primary:hover{ background:var(--pink-dark); }
+  .btn-secondary{ background:var(--pink-tint); color:var(--pink-dark); }
+  .btn-secondary:hover{ background:#F9D3E2; }
+  .btn-danger{ background:#FBE3DE; color:#B5432C; }
+  .btn-danger:hover{ background:#F5CCC3; }
+
+  .error-text{ color:#C43A3A; font-size:12px; margin-top:6px; display:none; font-weight:700; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <a class="back-link" href="index.html">&larr; All lists</a>
+  <div class="eyebrow">🎬 watch party 🎬</div>
+  <h1 class="title">Watchlist <span>✨</span></h1>
+  <p class="subtitle">What you're watching, what's next, and what you thought of it.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Watched</div>
+      <div class="stat-value" id="statFinished">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Watching now</div>
+      <div class="stat-value" id="statReading">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Titles logged</div>
+      <div class="stat-value" id="statPages">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg rating</div>
+      <div class="stat-value" id="statAvgRating">–</div>
+    </div>
+  </div>
+
+  <div class="filter-row" id="filterRow"></div>
+  <div class="genre-filter-row" id="genreFilterRow"></div>
+
+  <button class="add-btn" id="openAddBtn">+ Add title</button>
+
+  <div class="card-panel">
+    <div class="panel-top">
+      <span class="panel-big" id="goalProgress">0 of 0</span>
+      <span class="panel-sub-right" id="editGoalBtn">edit goal</span>
+    </div>
+    <p class="panel-caption">titles watched this year</p>
+    <div class="bar-track"><div class="bar-seg" id="goalBar" style="width:0%"></div></div>
+  </div>
+
+  <div class="card-panel">
+    <div class="panel-top">
+      <span class="panel-big">This week</span>
+      <span class="panel-sub-right" id="editWeeklyGoalBtn">edit goal</span>
+    </div>
+    <p class="panel-caption" id="weekRangeLabel"></p>
+
+    <p class="panel-caption" style="margin-bottom:4px;"><span id="weekBooksProgress">0 of 0</span> watched</p>
+    <div class="bar-track"><div class="bar-seg" id="weekBooksBar" style="width:0%; background:var(--teal);"></div></div>
+  </div>
+
+  <div id="itemListWrap"></div>
+</div>
+
+<div class="overlay" id="editOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="sheet-emoji" id="sheetEmoji">🎬</div>
+      <div>
+        <div class="sheet-title" id="sheetTitle"></div>
+        <div class="sheet-sub" id="sheetSub"></div>
+      </div>
+    </div>
+
+    <label class="field-label" style="margin-top:0;">Title</label>
+    <input class="field" type="text" placeholder="Title" id="editTitle">
+    <div class="error-text" id="editTitleError">Give it a title.</div>
+
+    <label class="field-label">Type</label>
+    <select class="field" id="editAuthor">
+      <option value="Movie">Movie</option>
+      <option value="TV Show">TV Show</option>
+      <option value="Documentary">Documentary</option>
+      <option value="Anime">Anime</option>
+      <option value="Special">Special</option>
+    </select>
+
+    <label class="field-label">Genre</label>
+    <input class="field" type="text" placeholder="e.g. Mystery" id="editGenre" list="genreOptions">
+
+    <label class="field-label">Status</label>
+    <select class="field" id="editStatus">
+      <option value="want">🍿 Want to watch</option>
+      <option value="reading">🎬 Watching</option>
+      <option value="finished">✅ Watched</option>
+    </select>
+
+    <div class="row2">
+      <div class="field-wrap">
+        <label class="field-label">Runtime (min)</label>
+        <input class="field" type="number" step="1" placeholder="0" id="editPages">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Watched on</label>
+        <input class="field" type="date" id="editFinishedDate">
+      </div>
+    </div>
+
+    <label class="field-label">Your rating</label>
+    <div class="star-picker" id="editStars">
+      <span data-val="1">★</span><span data-val="2">★</span><span data-val="3">★</span><span data-val="4">★</span><span data-val="5">★</span>
+    </div>
+
+    <label class="field-label">Notes (optional)</label>
+    <input class="field" type="text" placeholder="Thoughts, quotes, whatever" id="editNotes">
+
+    <div class="btn-row">
+      <button class="btn btn-danger" id="deleteBtn">Delete</button>
+      <button class="btn btn-primary" id="saveEditBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="addOverlay">
+  <div class="sheet">
+    <div class="sheet-title" style="margin-bottom:16px;">Add title</div>
+
+    <label class="field-label" style="margin-top:0;">Title</label>
+    <input class="field" type="text" placeholder="Title" id="newTitle">
+
+    <label class="field-label">Type</label>
+    <select class="field" id="newAuthor">
+      <option value="Movie">Movie</option>
+      <option value="TV Show">TV Show</option>
+      <option value="Documentary">Documentary</option>
+      <option value="Anime">Anime</option>
+      <option value="Special">Special</option>
+    </select>
+
+    <label class="field-label">Genre</label>
+    <input class="field" type="text" placeholder="e.g. Mystery" id="newGenre" list="genreOptions">
+
+    <label class="field-label">Status</label>
+    <select class="field" id="newStatus">
+      <option value="want">🍿 Want to watch</option>
+      <option value="reading">🎬 Watching</option>
+      <option value="finished">✅ Watched</option>
+    </select>
+
+    <label class="field-label">Runtime in minutes (optional)</label>
+    <input class="field" type="number" step="1" placeholder="0" id="newPages">
+
+    <div class="error-text" id="newError">Give it a title at least.</div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="addCancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="addSaveBtn">Add to watchlist</button>
+    </div>
+  </div>
+</div>
+
+<datalist id="genreOptions">
+  <option value="Action">
+  <option value="Adventure">
+  <option value="Animation">
+  <option value="Comedy">
+  <option value="Crime">
+  <option value="Documentary">
+  <option value="Drama">
+  <option value="Family">
+  <option value="Fantasy">
+  <option value="Horror">
+  <option value="Musical">
+  <option value="Mystery">
+  <option value="Reality TV">
+  <option value="Romance">
+  <option value="Sci-fi">
+  <option value="Sports">
+  <option value="Superhero">
+  <option value="Thriller">
+  <option value="True crime">
+  <option value="War">
+  <option value="Western">
+  <option value="Anime">
+</datalist>
+
+<div class="overlay" id="goalOverlay">
+  <div class="sheet">
+    <div class="sheet-title" style="margin-bottom:16px;">Yearly watch goal</div>
+    <label class="field-label" style="margin-top:0;">Titles watched this year</label>
+    <input class="field" type="number" step="1" placeholder="0" id="goalInput">
+    <div class="error-text" id="goalError">Enter a goal above 0.</div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="goalCancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="goalSaveBtn">Save goal</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="weeklyGoalOverlay">
+  <div class="sheet">
+    <div class="sheet-title" style="margin-bottom:16px;">Weekly watch goal</div>
+    <label class="field-label" style="margin-top:0;">Titles watched per week</label>
+    <input class="field" type="number" step="1" placeholder="0" id="weeklyBooksGoalInput">
+    <div class="error-text" id="weeklyGoalError">Enter a goal of 0 or more.</div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="weeklyGoalCancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="weeklyGoalSaveBtn">Save goal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STATUS = {
+  want:     { label:"Want to watch", emoji:"🍿" },
+  reading:  { label:"Watching",      emoji:"🎬" },
+  finished: { label:"Watched",       emoji:"✅" },
+};
+
+let books = [];
+let goal = 20;
+let weeklyBooksGoal = 1;
+let activeFilter = "all";
+let activeGenreFilter = "all";
+let activeBookId = null;
+let editStarValue = 0;
+
+const STORAGE_KEY = "watchlist-tracker-state";
+(function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (Array.isArray(saved.books)) books = saved.books;
+    if (typeof saved.goal === "number") goal = saved.goal;
+    if (typeof saved.weeklyBooksGoal === "number") weeklyBooksGoal = saved.weeklyBooksGoal;
+  } catch (e) {
+    console.error("Could not load saved data", e);
+  }
+})();
+
+function saveState(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ books, goal, weeklyBooksGoal }));
+  } catch (e) {
+    console.error("Could not save data", e);
+  }
+}
+
+function getWeekBounds(ref){
+  const d = ref ? new Date(ref) : new Date();
+  const day = (d.getDay() + 6) % 7;
+  const monday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - day);
+  const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
+  return { start: monday, end: sunday };
+}
+
+function isDateInRange(dateStr, start, end){
+  if (!dateStr) return false;
+  const d = new Date(dateStr + "T00:00:00");
+  return d >= start && d <= end;
+}
+
+function formatShortDate(d){
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+function todayStr(){
+  return new Date().toISOString().slice(0,10);
+}
+
+function starString(n){
+  const full = "★".repeat(n || 0);
+  const empty = "☆".repeat(5 - (n || 0));
+  return full + empty;
+}
+
+function renderFilterRow(){
+  const row = document.getElementById("filterRow");
+  row.innerHTML = "";
+  const allPill = document.createElement("div");
+  allPill.className = "pill" + (activeFilter === "all" ? " active" : "");
+  allPill.textContent = "📚 All";
+  allPill.addEventListener("click", () => { activeFilter = "all"; render(); });
+  row.appendChild(allPill);
+
+  Object.keys(STATUS).forEach(key => {
+    if (!books.some(b => b.status === key)) return;
+    const pill = document.createElement("div");
+    pill.className = "pill" + (activeFilter === key ? " active" : "");
+    pill.textContent = STATUS[key].emoji + " " + STATUS[key].label;
+    pill.addEventListener("click", () => { activeFilter = key; render(); });
+    row.appendChild(pill);
+  });
+}
+
+function renderGenreFilterRow(){
+  const row = document.getElementById("genreFilterRow");
+  row.innerHTML = "";
+  const genres = Array.from(new Set(books.map(b => b.genre).filter(Boolean))).sort();
+  if (genres.length === 0) return;
+
+  const allPill = document.createElement("div");
+  allPill.className = "genre-pill" + (activeGenreFilter === "all" ? " active" : "");
+  allPill.textContent = "All genres";
+  allPill.addEventListener("click", () => { activeGenreFilter = "all"; render(); });
+  row.appendChild(allPill);
+
+  genres.forEach(genre => {
+    const pill = document.createElement("div");
+    pill.className = "genre-pill" + (activeGenreFilter === genre ? " active" : "");
+    pill.textContent = genre;
+    pill.addEventListener("click", () => { activeGenreFilter = genre; render(); });
+    row.appendChild(pill);
+  });
+}
+
+function renderItemList(){
+  const wrap = document.getElementById("itemListWrap");
+  const listEl = document.createElement("div");
+  listEl.className = "item-list";
+  let totalShown = 0;
+
+  Object.keys(STATUS).forEach(statusKey => {
+    const list = books.filter(b =>
+      b.status === statusKey &&
+      (activeFilter === "all" || activeFilter === statusKey) &&
+      (activeGenreFilter === "all" || b.genre === activeGenreFilter)
+    );
+    if (list.length === 0) return;
+    if (activeFilter === "all"){
+      const label = document.createElement("div");
+      label.className = "group-label " + statusKey;
+      label.textContent = STATUS[statusKey].emoji + " " + STATUS[statusKey].label;
+      listEl.appendChild(label);
+    }
+    list.forEach(book => {
+      totalShown++;
+      const row = document.createElement("div");
+      row.className = "item-row " + statusKey;
+      const metaBits = [];
+      if (book.author) metaBits.push(book.author);
+      if (book.pages) metaBits.push(book.pages + " min");
+      row.innerHTML = `
+        <div class="item-emoji">${STATUS[statusKey].emoji}</div>
+        <div class="item-info">
+          <div class="item-name">${book.title}</div>
+          <div class="item-meta">${metaBits.join(" · ")}</div>
+          ${book.genre ? `<span class="genre-tag">${book.genre}</span>` : ""}
+        </div>
+        <div class="item-right">
+          ${statusKey === "finished" ? `<div class="item-stars">${starString(book.rating)}</div>` : `<span class="item-status-tag">${STATUS[statusKey].label}</span>`}
+        </div>
+      `;
+      row.addEventListener("click", () => openEditSheet(book.id));
+      listEl.appendChild(row);
+    });
+  });
+
+  wrap.innerHTML = "";
+  if (totalShown === 0){
+    wrap.innerHTML = `<div class="empty-state">Nothing on the list yet — add what's next 🍿</div>`;
+  } else {
+    wrap.appendChild(listEl);
+  }
+}
+
+function render(){
+  const finished = books.filter(b => b.status === "finished");
+  const reading = books.filter(b => b.status === "reading");
+  const pages = finished.reduce((s,b) => s + (Number(b.pages) || 0), 0);
+  const rated = finished.filter(b => b.rating);
+  const avgRating = rated.length ? (rated.reduce((s,b) => s + b.rating, 0) / rated.length) : null;
+
+  document.getElementById("statFinished").textContent = finished.length;
+  document.getElementById("statReading").textContent = reading.length;
+  document.getElementById("statPages").textContent = pages.toLocaleString();
+  document.getElementById("statAvgRating").textContent = avgRating ? avgRating.toFixed(1) + " ★" : "–";
+
+  document.getElementById("goalProgress").textContent = finished.length + " of " + goal;
+  const pct = goal > 0 ? Math.min(100, (finished.length / goal) * 100) : 0;
+  document.getElementById("goalBar").style.width = pct + "%";
+
+  const { start, end } = getWeekBounds();
+  document.getElementById("weekRangeLabel").textContent = formatShortDate(start) + " – " + formatShortDate(end);
+
+  const booksThisWeek = finished.filter(b => isDateInRange(b.finishedDate, start, end)).length;
+
+  document.getElementById("weekBooksProgress").textContent = booksThisWeek + " of " + weeklyBooksGoal;
+  const booksPct = weeklyBooksGoal > 0 ? Math.min(100, (booksThisWeek / weeklyBooksGoal) * 100) : 0;
+  document.getElementById("weekBooksBar").style.width = booksPct + "%";
+
+  renderFilterRow();
+  renderGenreFilterRow();
+  renderItemList();
+  saveState();
+}
+
+function setStarDisplay(container, value){
+  container.querySelectorAll("span").forEach(s => {
+    s.classList.toggle("filled", Number(s.dataset.val) <= value);
+  });
+}
+
+document.getElementById("editStars").querySelectorAll("span").forEach(s => {
+  s.addEventListener("click", () => {
+    editStarValue = Number(s.dataset.val);
+    setStarDisplay(document.getElementById("editStars"), editStarValue);
+  });
+});
+
+function openEditSheet(bookId){
+  activeBookId = bookId;
+  const book = books.find(b => b.id === bookId);
+  document.getElementById("sheetEmoji").textContent = STATUS[book.status].emoji;
+  document.getElementById("sheetTitle").textContent = book.title;
+  document.getElementById("sheetSub").textContent = STATUS[book.status].label;
+  document.getElementById("editTitle").value = book.title;
+  document.getElementById("editAuthor").value = book.author || "";
+  document.getElementById("editGenre").value = book.genre || "";
+  document.getElementById("editStatus").value = book.status;
+  document.getElementById("editPages").value = book.pages || "";
+  document.getElementById("editFinishedDate").value = book.finishedDate || "";
+  document.getElementById("editNotes").value = book.notes || "";
+  editStarValue = book.rating || 0;
+  setStarDisplay(document.getElementById("editStars"), editStarValue);
+  document.getElementById("editTitleError").style.display = "none";
+  document.getElementById("editOverlay").classList.add("open");
+}
+
+function closeEditSheet(){
+  document.getElementById("editOverlay").classList.remove("open");
+  activeBookId = null;
+}
+
+document.getElementById("editOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "editOverlay") closeEditSheet();
+});
+
+document.getElementById("editStatus").addEventListener("change", (e) => {
+  if (e.target.value === "finished" && !document.getElementById("editFinishedDate").value){
+    document.getElementById("editFinishedDate").value = todayStr();
+  }
+});
+
+document.getElementById("saveEditBtn").addEventListener("click", () => {
+  const title = document.getElementById("editTitle").value.trim();
+  const titleError = document.getElementById("editTitleError");
+  if (!title){ titleError.style.display = "block"; return; }
+  titleError.style.display = "none";
+
+  const book = books.find(b => b.id === activeBookId);
+  const newStatus = document.getElementById("editStatus").value;
+  book.title = title;
+  book.author = document.getElementById("editAuthor").value.trim();
+  book.genre = document.getElementById("editGenre").value.trim();
+  book.status = newStatus;
+  book.pages = parseInt(document.getElementById("editPages").value) || 0;
+  book.finishedDate = document.getElementById("editFinishedDate").value || "";
+  if (newStatus === "finished" && !book.finishedDate) book.finishedDate = todayStr();
+  book.notes = document.getElementById("editNotes").value.trim();
+  book.rating = editStarValue;
+  closeEditSheet();
+  render();
+});
+
+document.getElementById("deleteBtn").addEventListener("click", () => {
+  books = books.filter(b => b.id !== activeBookId);
+  closeEditSheet();
+  render();
+});
+
+document.getElementById("openAddBtn").addEventListener("click", () => {
+  document.getElementById("newTitle").value = "";
+  document.getElementById("newAuthor").value = "";
+  document.getElementById("newGenre").value = "";
+  document.getElementById("newStatus").value = activeFilter !== "all" ? activeFilter : "want";
+  document.getElementById("newPages").value = "";
+  document.getElementById("newError").style.display = "none";
+  document.getElementById("addOverlay").classList.add("open");
+});
+
+function closeAddSheet(){
+  document.getElementById("addOverlay").classList.remove("open");
+}
+
+document.getElementById("addCancelBtn").addEventListener("click", closeAddSheet);
+document.getElementById("addOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "addOverlay") closeAddSheet();
+});
+
+document.getElementById("addSaveBtn").addEventListener("click", () => {
+  const title = document.getElementById("newTitle").value.trim();
+  const author = document.getElementById("newAuthor").value.trim();
+  const genre = document.getElementById("newGenre").value.trim();
+  const status = document.getElementById("newStatus").value;
+  const pages = parseInt(document.getElementById("newPages").value) || 0;
+  const errorEl = document.getElementById("newError");
+
+  if (!title){
+    errorEl.style.display = "block";
+    return;
+  }
+  errorEl.style.display = "none";
+
+  const id = "title_" + Date.now();
+  books.unshift({
+    id, title, author, genre, status, pages,
+    rating: 0,
+    finishedDate: status === "finished" ? todayStr() : "",
+    notes: "",
+  });
+  closeAddSheet();
+  render();
+});
+
+document.getElementById("editGoalBtn").addEventListener("click", () => {
+  document.getElementById("goalInput").value = goal;
+  document.getElementById("goalError").style.display = "none";
+  document.getElementById("goalOverlay").classList.add("open");
+});
+
+function closeGoalSheet(){
+  document.getElementById("goalOverlay").classList.remove("open");
+}
+
+document.getElementById("goalCancelBtn").addEventListener("click", closeGoalSheet);
+document.getElementById("goalOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "goalOverlay") closeGoalSheet();
+});
+
+document.getElementById("goalSaveBtn").addEventListener("click", () => {
+  const val = parseInt(document.getElementById("goalInput").value);
+  const errorEl = document.getElementById("goalError");
+  if (isNaN(val) || val <= 0){
+    errorEl.style.display = "block";
+    return;
+  }
+  errorEl.style.display = "none";
+  goal = val;
+  closeGoalSheet();
+  render();
+});
+
+document.getElementById("editWeeklyGoalBtn").addEventListener("click", () => {
+  document.getElementById("weeklyBooksGoalInput").value = weeklyBooksGoal;
+  document.getElementById("weeklyGoalError").style.display = "none";
+  document.getElementById("weeklyGoalOverlay").classList.add("open");
+});
+
+function closeWeeklyGoalSheet(){
+  document.getElementById("weeklyGoalOverlay").classList.remove("open");
+}
+
+document.getElementById("weeklyGoalCancelBtn").addEventListener("click", closeWeeklyGoalSheet);
+document.getElementById("weeklyGoalOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "weeklyGoalOverlay") closeWeeklyGoalSheet();
+});
+
+document.getElementById("weeklyGoalSaveBtn").addEventListener("click", () => {
+  const booksVal = parseInt(document.getElementById("weeklyBooksGoalInput").value);
+  const errorEl = document.getElementById("weeklyGoalError");
+  if (isNaN(booksVal) || booksVal < 0){
+    errorEl.style.display = "block";
+    return;
+  }
+  errorEl.style.display = "none";
+  weeklyBooksGoal = booksVal;
+  closeWeeklyGoalSheet();
+  render();
+});
+
+render();
+</script>
+
+</body>
+</html>

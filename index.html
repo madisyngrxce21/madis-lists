@@ -23,6 +23,9 @@
     --teal:#1EA88F;
     --teal-tint:#DFF5F1;
     --sky-tint:#DFF3FB;
+    --amber-tint:#FCEED9;
+    --green-tint:#DEF6EB;
+    --plum-tint:#F1E6FA;
     --shadow: 0 2px 4px rgba(58,15,39,0.04), 0 10px 24px -14px rgba(58,15,39,0.18);
   }
 
@@ -89,6 +92,9 @@
   .link-card.budget .link-emoji{ background:var(--violet-tint); }
   .link-card.fitness .link-emoji{ background:var(--teal-tint); }
   .link-card.reading .link-emoji{ background:var(--sky-tint); }
+  .link-card.movies .link-emoji{ background:var(--plum-tint); }
+  .link-card.recipes .link-emoji{ background:var(--amber-tint); }
+  .link-card.meals .link-emoji{ background:var(--green-tint); }
 
   .link-info{ flex:1; min-width:0; }
   .link-name-row{ display:flex; align-items:center; gap:6px; margin-bottom:2px; }
@@ -161,6 +167,42 @@
         <span class="edit-title-btn" data-key="reading" data-default="Reading tracker" title="Rename">✏️</span>
       </div>
       <div class="link-desc">Shelf goals, ratings, and reading goals</div>
+    </div>
+    <div class="link-arrow">&rarr;</div>
+  </a>
+
+  <a class="link-card movies" href="movies.html">
+    <div class="link-emoji">🎬</div>
+    <div class="link-info">
+      <div class="link-name-row">
+        <div class="link-name" data-key="movies">Watchlist</div>
+        <span class="edit-title-btn" data-key="movies" data-default="Watchlist" title="Rename">✏️</span>
+      </div>
+      <div class="link-desc">Movies and shows, watched and want to watch</div>
+    </div>
+    <div class="link-arrow">&rarr;</div>
+  </a>
+
+  <a class="link-card recipes" href="recipes.html">
+    <div class="link-emoji">🍳</div>
+    <div class="link-info">
+      <div class="link-name-row">
+        <div class="link-name" data-key="recipes">Recipe box</div>
+        <span class="edit-title-btn" data-key="recipes" data-default="Recipe box" title="Rename">✏️</span>
+      </div>
+      <div class="link-desc">Recipes to try, sorted by category</div>
+    </div>
+    <div class="link-arrow">&rarr;</div>
+  </a>
+
+  <a class="link-card meals" href="meal-planner.html">
+    <div class="link-emoji">🍽️</div>
+    <div class="link-info">
+      <div class="link-name-row">
+        <div class="link-name" data-key="meals">Meal planner</div>
+        <span class="edit-title-btn" data-key="meals" data-default="Meal planner" title="Rename">✏️</span>
+      </div>
+      <div class="link-desc">This week's menu and grocery list</div>
     </div>
     <div class="link-arrow">&rarr;</div>
   </a>

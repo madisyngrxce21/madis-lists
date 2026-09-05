@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recipe Box</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap');
+
+  :root{
+    --bg-top:#FFF1F6;
+    --bg-bottom:#FFF8EE;
+    --card:#FFFFFF;
+    --ink:#3A2233;
+    --muted:#9C7E92;
+    --line:#F6E3ED;
+    --pink:#F0407A;
+    --pink-dark:#C22A5E;
+    --pink-tint:#FDE4ED;
+    --pink-deep:#3A0F27;
+    --violet:#8A5FCF;
+    --violet-dark:#5F3EA0;
+    --violet-tint:#EEE6FA;
+    --teal:#1EA88F;
+    --teal-dark:#137A66;
+    --teal-tint:#DFF5F1;
+    --green:#39B383;
+    --green-dark:#22855F;
+    --green-tint:#DEF6EB;
+    --amber:#F0A63C;
+    --amber-dark:#C77D14;
+    --amber-tint:#FCEED9;
+    --plum:#9A5FC2;
+    --plum-dark:#6E3E96;
+    --plum-tint:#F1E6FA;
+    --sky:#3CA9D6;
+    --sky-dark:#217CA3;
+    --sky-tint:#DFF3FB;
+    --gold:#E8B90B;
+    --shadow: 0 2px 4px rgba(58,15,39,0.04), 0 10px 24px -14px rgba(58,15,39,0.18);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 55%);
+    font-family:'Nunito',sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:32px 16px 64px;
+  }
+
+  .phone{ width:100%; max-width:460px; }
+
+  .back-link{ display:inline-block; margin-bottom:16px; font-size:13px; font-weight:700; color:var(--muted); text-decoration:none; }
+  .back-link:hover{ color:var(--pink-dark); }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--pink-tint);
+    color:var(--pink-dark);
+    font-weight:700;
+    font-size:12.5px;
+    padding:6px 14px;
+    border-radius:999px;
+    margin-bottom:12px;
+  }
+
+  h1.title{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:34px;
+    letter-spacing:-0.01em;
+    margin:0 0 6px;
+    color:var(--pink);
+  }
+
+  .subtitle{ color:var(--muted); font-size:14px; margin:0 0 22px; font-weight:600; }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .stat-card{
+    background:var(--card);
+    border-radius:18px;
+    padding:14px 16px;
+    box-shadow:var(--shadow);
+  }
+  .stat-label{ font-size:11.5px; font-weight:700; color:var(--muted); margin-bottom:4px; }
+  .stat-value{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:21px; color:var(--pink-deep); }
+
+  .filter-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:9px 16px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:700;
+    background:var(--card);
+    color:var(--ink);
+    border:1px solid var(--line);
+    cursor:pointer;
+    transition:all .15s ease;
+    white-space:nowrap;
+  }
+  .pill:hover{ border-color:var(--pink); }
+  .pill.active{
+    background:var(--pink-deep);
+    color:white;
+    border-color:var(--pink-deep);
+  }
+
+  .add-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--pink);
+    color:white;
+    font-weight:700;
+    font-size:13.5px;
+    border:none;
+    border-radius:999px;
+    padding:11px 20px;
+    cursor:pointer;
+    box-shadow:0 6px 16px -6px rgba(240,64,122,0.55);
+    margin-bottom:20px;
+    width:100%;
+    justify-content:center;
+  }
+  .add-btn:hover{ background:var(--pink-dark); }
+
+  .card-panel{
+    background:var(--card);
+    border-radius:20px;
+    padding:18px;
+    box-shadow:var(--shadow);
+    margin-bottom:18px;
+  }
+
+  .panel-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:2px;
+  }
+  .panel-big{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:22px; }
+  .panel-caption{ font-size:12.5px; color:var(--muted); margin:0 0 12px; font-weight:600; }
+
+  .bar-track{
+    height:10px;
+    border-radius:6px;
+    background:var(--line);
+    overflow:hidden;
+    margin-bottom:2px;
+  }
+  .bar-seg{ height:100%; background:var(--pink); }
+
+  .empty-state{
+    text-align:center;
+    padding:50px 20px;
+    color:var(--muted);
+    font-weight:700;
+    font-size:14.5px;
+  }
+
+  .item-list{ display:flex; flex-direction:column; gap:10px; }
+  .group-label{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    margin:14px 0 2px;
+  }
+  .group-label:first-child{ margin-top:0; }
+  .group-label.breakfast{ color:var(--amber-dark); }
+  .group-label.lunch{ color:var(--sky-dark); }
+  .group-label.dinner{ color:var(--pink-dark); }
+  .group-label.dessert{ color:var(--plum-dark); }
+  .group-label.baking{ color:var(--violet-dark); }
+  .group-label.drinks{ color:var(--teal-dark); }
+  .group-label.misc{ color:var(--green-dark); }
+
+  .item-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--card);
+    border-radius:16px;
+    padding:12px 14px;
+    box-shadow:var(--shadow);
+    border:1px solid transparent;
+    transition:border-color .15s ease;
+  }
+  .item-row:hover{ border-color:var(--line); }
+  .item-row.made{ opacity:0.7; }
+
+  .item-check{
+    width:20px; height:20px; flex-shrink:0; cursor:pointer; accent-color:var(--pink);
+  }
+
+  .item-emoji{
+    width:34px; height:34px; border-radius:11px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; flex-shrink:0;
+  }
+  .item-row.breakfast .item-emoji{ background:var(--amber-tint); }
+  .item-row.lunch .item-emoji{ background:var(--sky-tint); }
+  .item-row.dinner .item-emoji{ background:var(--pink-tint); }
+  .item-row.dessert .item-emoji{ background:var(--plum-tint); }
+  .item-row.baking .item-emoji{ background:var(--violet-tint); }
+  .item-row.drinks .item-emoji{ background:var(--teal-tint); }
+  .item-row.misc .item-emoji{ background:var(--green-tint); }
+
+  .item-info{ flex:1; min-width:0; cursor:pointer; }
+  .item-name{ font-weight:700; font-size:14px; }
+  .item-name.made{ text-decoration:line-through; }
+  .item-name a{ color:inherit; text-decoration:none; }
+  .item-name a:hover{ text-decoration:underline; }
+  .item-meta{ font-size:12px; color:var(--muted); font-weight:600; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .made-badge{ font-size:16px; flex-shrink:0; }
+
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(58,15,39,0.35);
+    display:none; align-items:flex-end; justify-content:center;
+    z-index:10;
+  }
+  .overlay.open{ display:flex; }
+
+  .sheet{
+    background:var(--card);
+    width:100%; max-width:460px;
+    border-radius:26px 26px 0 0;
+    padding:24px 22px 28px;
+    box-shadow:0 -8px 30px rgba(58,15,39,0.2);
+    max-height:88vh;
+    overflow-y:auto;
+  }
+
+  .sheet-head{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .sheet-emoji{
+    width:40px; height:40px; border-radius:13px;
+    display:flex; align-items:center; justify-content:center; font-size:19px;
+  }
+  .sheet-title{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:19px; color:var(--pink-deep); }
+  .sheet-sub{ font-size:12.5px; color:var(--muted); font-weight:600; }
+
+  .field-label{ font-size:12.5px; color:var(--muted); font-weight:700; margin:14px 0 6px; display:block; }
+  .field{
+    width:100%;
+    border:1.5px solid var(--line);
+    border-radius:14px;
+    padding:12px 14px;
+    font-size:15px;
+    font-family:'Nunito',sans-serif;
+    font-weight:600;
+    background:#FFFBFD;
+  }
+  .field:focus{ outline:none; border-color:var(--pink); }
+  textarea.field{ resize:vertical; min-height:72px; font-family:'Nunito',sans-serif; }
+
+  .btn-row{ display:flex; gap:10px; margin-top:20px; }
+  .btn{
+    flex:1; border:none; border-radius:14px; padding:13px;
+    font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer;
+  }
+  .btn-primary{ background:var(--pink); color:white; }
+  .btn-primary:hover{ background:var(--pink-dark); }
+  .btn-secondary{ background:var(--pink-tint); color:var(--pink-dark); }
+  .btn-secondary:hover{ background:#F9D3E2; }
+  .btn-danger{ background:#FBE3DE; color:#B5432C; }
+  .btn-danger:hover{ background:#F5CCC3; }
+
+  .error-text{ color:#C43A3A; font-size:12px; margin-top:6px; display:none; font-weight:700; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <a class="back-link" href="index.html">&larr; All lists</a>
+  <div class="eyebrow">🍳 the good stuff 🍳</div>
+  <h1 class="title">Recipe box ✨</h1>
+  <p class="subtitle">Everything you want to cook, sorted by category.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Recipes</div>
+      <div class="stat-value" id="statCount">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Made it</div>
+      <div class="stat-value" id="statMade">0</div>
+    </div>
+  </div>
+
+  <div class="filter-row" id="filterRow"></div>
+
+  <button class="add-btn" id="openAddBtn">+ Add recipe</button>
+
+  <div class="card-panel">
+    <div class="panel-top">
+      <span class="panel-big" id="madeProgress">0 of 0</span>
+    </div>
+    <p class="panel-caption">recipes made</p>
+    <div class="bar-track"><div class="bar-seg" id="madeBar" style="width:0%"></div></div>
+  </div>
+
+  <div id="itemListWrap"></div>
+</div>
+
+<div class="overlay" id="editOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="sheet-emoji" id="sheetEmoji"></div>
+      <div>
+        <div class="sheet-title" id="sheetTitle"></div>
+        <div class="sheet-sub" id="sheetSub"></div>
+      </div>
+    </div>
+
+    <label class="field-label" style="margin-top:0;">Name</label>
+    <input class="field" type="text" placeholder="Recipe name" id="editName">
+    <div class="error-text" id="editNameError">Give it a name.</div>
+
+    <label class="field-label">Category</label>
+    <select class="field" id="editCategory"></select>
+
+    <label class="field-label">Link (optional)</label>
+    <input class="field" type="text" placeholder="https://..." id="editUrl">
+
+    <label class="field-label">Notes (optional)</label>
+    <textarea class="field" placeholder="Ingredients, tweaks, whatever you'll want to remember" id="editNotes"></textarea>
+
+    <div class="btn-row">
+      <button class="btn btn-danger" id="deleteBtn">Delete</button>
+      <button class="btn btn-primary" id="saveEditBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="addOverlay">
+  <div class="sheet">
+    <div class="sheet-title" style="margin-bottom:16px;">Add recipe</div>
+
+    <label class="field-label" style="margin-top:0;">Category</label>
+    <select class="field" id="newCategory"></select>
+
+    <label class="field-label">Name</label>
+    <input class="field" type="text" placeholder="e.g. Sunday morning pancakes" id="newName">
+
+    <label class="field-label">Link (optional)</label>
+    <input class="field" type="text" placeholder="https://..." id="newUrl">
+
+    <label class="field-label">Notes (optional)</label>
+    <textarea class="field" placeholder="Ingredients, tweaks, whatever you'll want to remember" id="newNotes"></textarea>
+
+    <div class="error-text" id="newError">Give it a name at least.</div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="addCancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="addSaveBtn">Add to box</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATEGORIES = {
+  breakfast: { label:"Breakfast", emoji:"🥞" },
+  lunch:     { label:"Lunch",     emoji:"🥪" },
+  dinner:    { label:"Dinner",    emoji:"🍝" },
+  dessert:   { label:"Dessert",   emoji:"🍰" },
+  baking:    { label:"Baking",    emoji:"🥖" },
+  drinks:    { label:"Drinks",    emoji:"🍹" },
+  misc:      { label:"Misc",      emoji:"✨" },
+};
+
+const tintMap = {
+  breakfast:"var(--amber-tint)", lunch:"var(--sky-tint)", dinner:"var(--pink-tint)",
+  dessert:"var(--plum-tint)", baking:"var(--violet-tint)", drinks:"var(--teal-tint)", misc:"var(--green-tint)",
+};
+
+let recipes = [];
+let activeFilter = "all";
+let activeRecipeId = null;
+
+const STORAGE_KEY = "recipe-box-state";
+(function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (Array.isArray(saved.recipes)) recipes = saved.recipes;
+  } catch (e) {
+    console.error("Could not load saved data", e);
+  }
+})();
+
+function saveState(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ recipes }));
+  } catch (e) {
+    console.error("Could not save data", e);
+  }
+}
+
+function renderFilterRow(){
+  const row = document.getElementById("filterRow");
+  row.innerHTML = "";
+  const allPill = document.createElement("div");
+  allPill.className = "pill" + (activeFilter === "all" ? " active" : "");
+  allPill.textContent = "💕 All";
+  allPill.addEventListener("click", () => { activeFilter = "all"; render(); });
+  row.appendChild(allPill);
+
+  Object.keys(CATEGORIES).forEach(catKey => {
+    if (!recipes.some(r => r.category === catKey)) return;
+    const cat = CATEGORIES[catKey];
+    const pill = document.createElement("div");
+    pill.className = "pill" + (activeFilter === catKey ? " active" : "");
+    pill.textContent = cat.emoji + " " + cat.label;
+    pill.addEventListener("click", () => { activeFilter = catKey; render(); });
+    row.appendChild(pill);
+  });
+}
+
+function renderItemList(){
+  const wrap = document.getElementById("itemListWrap");
+  const listEl = document.createElement("div");
+  listEl.className = "item-list";
+  let totalShown = 0;
+
+  Object.keys(CATEGORIES).forEach(catKey => {
+    const catItems = recipes.filter(r => r.category === catKey && (activeFilter === "all" || activeFilter === catKey));
+    if (catItems.length === 0) return;
+    if (activeFilter === "all"){
+      const label = document.createElement("div");
+      label.className = "group-label " + catKey;
+      label.textContent = CATEGORIES[catKey].emoji + " " + CATEGORIES[catKey].label;
+      listEl.appendChild(label);
+    }
+    catItems.forEach(recipe => {
+      totalShown++;
+      const row = document.createElement("div");
+      row.className = "item-row " + catKey + (recipe.made ? " made" : "");
+
+      const check = document.createElement("input");
+      check.type = "checkbox";
+      check.className = "item-check";
+      check.checked = !!recipe.made;
+      check.addEventListener("click", (e) => e.stopPropagation());
+      check.addEventListener("change", () => {
+        recipe.made = check.checked;
+        render();
+      });
+
+      const emojiBadge = document.createElement("div");
+      emojiBadge.className = "item-emoji";
+      emojiBadge.textContent = CATEGORIES[catKey].emoji;
+
+      const nameHtml = recipe.url
+        ? `<a href="${recipe.url}" target="_blank" rel="noopener noreferrer">${recipe.name}</a>`
+        : recipe.name;
+
+      const info = document.createElement("div");
+      info.className = "item-info";
+      info.innerHTML = `
+        <div class="item-name${recipe.made ? " made" : ""}">${nameHtml}</div>
+        ${recipe.notes ? `<div class="item-meta">${recipe.notes}</div>` : ""}
+      `;
+      info.addEventListener("click", (e) => {
+        if (e.target.tagName === "A") return;
+        openEditSheet(recipe.id);
+      });
+
+      row.appendChild(check);
+      row.appendChild(emojiBadge);
+      row.appendChild(info);
+      if (recipe.made){
+        const badge = document.createElement("div");
+        badge.className = "made-badge";
+        badge.textContent = "⭐";
+        row.appendChild(badge);
+      }
+      listEl.appendChild(row);
+    });
+  });
+
+  wrap.innerHTML = "";
+  if (totalShown === 0){
+    wrap.innerHTML = `<div class="empty-state">Nothing in the box yet — add your first recipe 🍳</div>`;
+  } else {
+    wrap.appendChild(listEl);
+  }
+}
+
+function render(){
+  const made = recipes.filter(r => r.made).length;
+
+  document.getElementById("statCount").textContent = recipes.length;
+  document.getElementById("statMade").textContent = made;
+  document.getElementById("madeProgress").textContent = made + " of " + recipes.length;
+  const pct = recipes.length > 0 ? (made / recipes.length) * 100 : 0;
+  document.getElementById("madeBar").style.width = pct + "%";
+
+  renderFilterRow();
+  renderItemList();
+  saveState();
+}
+
+function populateCategorySelect(select, selected){
+  select.innerHTML = "";
+  Object.keys(CATEGORIES).forEach(catKey => {
+    const opt = document.createElement("option");
+    opt.value = catKey;
+    opt.textContent = CATEGORIES[catKey].emoji + " " + CATEGORIES[catKey].label;
+    if (catKey === selected) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+function openEditSheet(recipeId){
+  activeRecipeId = recipeId;
+  const recipe = recipes.find(r => r.id === recipeId);
+  document.getElementById("sheetEmoji").textContent = CATEGORIES[recipe.category].emoji;
+  document.getElementById("sheetEmoji").style.background = tintMap[recipe.category];
+  document.getElementById("sheetTitle").textContent = recipe.name;
+  document.getElementById("sheetSub").textContent = recipe.made ? "Made it" : "Haven't made it yet";
+  document.getElementById("editName").value = recipe.name;
+  document.getElementById("editUrl").value = recipe.url || "";
+  document.getElementById("editNotes").value = recipe.notes || "";
+  populateCategorySelect(document.getElementById("editCategory"), recipe.category);
+  document.getElementById("editNameError").style.display = "none";
+  document.getElementById("editOverlay").classList.add("open");
+}
+
+function closeEditSheet(){
+  document.getElementById("editOverlay").classList.remove("open");
+  activeRecipeId = null;
+}
+
+document.getElementById("editOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "editOverlay") closeEditSheet();
+});
+
+document.getElementById("saveEditBtn").addEventListener("click", () => {
+  const name = document.getElementById("editName").value.trim();
+  const url = document.getElementById("editUrl").value.trim();
+  const notes = document.getElementById("editNotes").value.trim();
+  const category = document.getElementById("editCategory").value;
+  const nameError = document.getElementById("editNameError");
+
+  if (!name){ nameError.style.display = "block"; return; }
+  nameError.style.display = "none";
+
+  const recipe = recipes.find(r => r.id === activeRecipeId);
+  recipe.name = name;
+  recipe.url = url;
+  recipe.notes = notes;
+  recipe.category = category;
+  closeEditSheet();
+  render();
+});
+
+document.getElementById("deleteBtn").addEventListener("click", () => {
+  recipes = recipes.filter(r => r.id !== activeRecipeId);
+  closeEditSheet();
+  render();
+});
+
+document.getElementById("openAddBtn").addEventListener("click", () => {
+  populateCategorySelect(document.getElementById("newCategory"), activeFilter !== "all" ? activeFilter : "breakfast");
+  document.getElementById("newName").value = "";
+  document.getElementById("newUrl").value = "";
+  document.getElementById("newNotes").value = "";
+  document.getElementById("newError").style.display = "none";
+  document.getElementById("addOverlay").classList.add("open");
+});
+
+function closeAddSheet(){
+  document.getElementById("addOverlay").classList.remove("open");
+}
+
+document.getElementById("addCancelBtn").addEventListener("click", closeAddSheet);
+document.getElementById("addOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "addOverlay") closeAddSheet();
+});
+
+document.getElementById("addSaveBtn").addEventListener("click", () => {
+  const category = document.getElementById("newCategory").value;
+  const name = document.getElementById("newName").value.trim();
+  const url = document.getElementById("newUrl").value.trim();
+  const notes = document.getElementById("newNotes").value.trim();
+  const errorEl = document.getElementById("newError");
+
+  if (!name){
+    errorEl.style.display = "block";
+    return;
+  }
+  errorEl.style.display = "none";
+
+  const id = category + "_" + Date.now();
+  recipes.unshift({ id, name, url, notes, category, made: false });
+  closeAddSheet();
+  render();
+});
+
+render();
+</script>
+
+</body>
+</html>
