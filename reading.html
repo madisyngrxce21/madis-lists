@@ -502,6 +502,7 @@
   </div>
 </div>
 
+<script src="sync.js"></script>
 <script>
 const STATUS = {
   want:     { label:"Want to read", emoji:"📝" },
@@ -518,9 +519,8 @@ let activeBookId = null;
 let editStarValue = 0;
 
 const STORAGE_KEY = "reading-tracker-state";
-(function loadState(){
+function loadState(raw){
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
     const saved = JSON.parse(raw);
     if (Array.isArray(saved.books)) books = saved.books;
@@ -529,11 +529,14 @@ const STORAGE_KEY = "reading-tracker-state";
   } catch (e) {
     console.error("Could not load saved data", e);
   }
-})();
+}
+loadState(localStorage.getItem(STORAGE_KEY));
 
 function saveState(){
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ books, goal, weeklyBooksGoal }));
+    const json = JSON.stringify({ books, goal, weeklyBooksGoal });
+    localStorage.setItem(STORAGE_KEY, json);
+    if (window.MadiSync) MadiSync.push(STORAGE_KEY, json);
   } catch (e) {
     console.error("Could not save data", e);
   }
@@ -863,6 +866,8 @@ document.getElementById("weeklyGoalSaveBtn").addEventListener("click", () => {
 });
 
 render();
+
+if (window.MadiSync) MadiSync.init(STORAGE_KEY, (raw) => { loadState(raw); render(); });
 </script>
 
 </body>

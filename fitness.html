@@ -499,6 +499,7 @@
   </div>
 </div>
 
+<script src="sync.js"></script>
 <script>
 let data = {
   breakfast: { label:"Breakfast", emoji:"🥐", items:[] },
@@ -515,9 +516,8 @@ let activeFilter = "all";
 let weightEntries = [];
 
 const STORAGE_KEY = "plate-tracker-state";
-(function loadState(){
+function loadState(raw){
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
     const saved = JSON.parse(raw);
     if (saved.data) data = saved.data;
@@ -526,11 +526,14 @@ const STORAGE_KEY = "plate-tracker-state";
   } catch (e) {
     console.error("Could not load saved data", e);
   }
-})();
+}
+loadState(localStorage.getItem(STORAGE_KEY));
 
 function saveState(){
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ data, dailyGoal, weightEntries }));
+    const json = JSON.stringify({ data, dailyGoal, weightEntries });
+    localStorage.setItem(STORAGE_KEY, json);
+    if (window.MadiSync) MadiSync.push(STORAGE_KEY, json);
   } catch (e) {
     console.error("Could not save data", e);
   }
@@ -1010,6 +1013,8 @@ document.getElementById("weightSaveBtn").addEventListener("click", () => {
 
 render();
 renderWeightCard();
+
+if (window.MadiSync) MadiSync.init(STORAGE_KEY, (raw) => { loadState(raw); render(); renderWeightCard(); });
 </script>
 
 </body>

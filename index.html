@@ -114,6 +114,46 @@
   .link-desc{ font-size:12.5px; color:var(--muted); font-weight:600; }
 
   .link-arrow{ font-size:18px; color:var(--muted); flex-shrink:0; }
+
+  .sync-card{
+    background:var(--card);
+    border-radius:20px;
+    padding:16px 18px;
+    box-shadow:var(--shadow);
+    margin-bottom:20px;
+  }
+  .sync-head{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .sync-icon{ font-size:20px; flex-shrink:0; }
+  .sync-title{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:15px; }
+  .sync-status{ font-size:12px; color:var(--muted); font-weight:600; margin-top:1px; }
+  .sync-input{
+    width:100%; border:1.5px solid var(--line); border-radius:12px; padding:10px 12px;
+    font-size:13.5px; font-family:'Nunito',sans-serif; font-weight:600; background:#FFFBFD; margin-bottom:8px;
+  }
+  .sync-input:focus{ outline:none; border-color:var(--pink); }
+  .sync-btn{
+    width:100%; border:none; border-radius:12px; padding:10px; background:var(--pink); color:white;
+    font-weight:700; font-size:13px; cursor:pointer; margin:0;
+  }
+  .sync-btn:hover{ background:var(--pink-dark); }
+  .sync-btn-secondary{ background:var(--pink-tint); color:var(--pink-dark); }
+  .sync-btn-secondary:hover{ background:#F9D3E2; }
+  .sync-btn-danger{ background:var(--pink-tint); color:var(--pink-dark); margin-top:8px; }
+  .sync-btn-danger:hover{ background:#F9D3E2; }
+  .sync-code-row{ display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+  .sync-code{
+    flex:1; background:#FFFBFD; border:1.5px solid var(--line); border-radius:10px; padding:9px 10px;
+    font-size:13px; font-weight:700; letter-spacing:0.3px; word-break:break-all;
+  }
+  .sync-copy-btn{
+    border:none; background:var(--pink-tint); color:var(--pink-dark); border-radius:10px; padding:9px 12px;
+    font-weight:700; font-size:12.5px; cursor:pointer; flex-shrink:0;
+  }
+  .sync-copy-btn:hover{ background:#F9D3E2; }
+  .sync-hint{ font-size:11.5px; color:var(--muted); font-weight:600; margin:0 0 10px; }
+  .sync-error{ color:#C43A3A; font-size:12px; margin-top:8px; font-weight:700; }
+  .sync-disable-row{ display:flex; gap:8px; margin-top:8px; }
+  .sync-disable-row .sync-btn{ margin:0; }
 </style>
 </head>
 <body>
@@ -122,6 +162,35 @@
   <div class="eyebrow">💖 pick a list 💖</div>
   <h1 class="title">Madi's lists</h1>
   <p class="subtitle">Everything in one place, saved right on this device.</p>
+
+  <div class="sync-card" id="syncCard">
+    <div class="sync-head">
+      <span class="sync-icon">🔄</span>
+      <div>
+        <div class="sync-title">Sync across devices</div>
+        <div class="sync-status" id="syncStatus">Not synced — data stays on this device only</div>
+      </div>
+    </div>
+
+    <div id="syncOff">
+      <input class="sync-input" type="text" id="syncCodeInput" placeholder="Paste a code from another device, or leave blank">
+      <button class="sync-btn" id="syncEnableBtn">Turn on sync</button>
+      <p class="sync-error" id="syncEnableError" style="display:none;">Sync isn't available right now — try reloading the page.</p>
+    </div>
+
+    <div id="syncOn" style="display:none;">
+      <div class="sync-code-row">
+        <code class="sync-code" id="syncCodeDisplay"></code>
+        <button class="sync-copy-btn" id="syncCopyBtn">Copy</button>
+      </div>
+      <p class="sync-hint">Enter this exact code on your other device's Sync card to connect it. Keep it private — anyone with this code can see and edit this data.</p>
+      <button class="sync-btn sync-btn-danger" id="syncDisableBtn">Turn off sync</button>
+      <div class="sync-disable-row" id="syncDisableConfirm" style="display:none;">
+        <button class="sync-btn sync-btn-secondary" id="syncDisableCancelBtn">Cancel</button>
+        <button class="sync-btn sync-btn-danger" id="syncDisableConfirmBtn">Yes, turn off</button>
+      </div>
+    </div>
+  </div>
 
   <a class="link-card florida" href="moving.html">
     <div class="link-emoji">🌴</div>
@@ -208,6 +277,7 @@
   </a>
 </div>
 
+<script src="sync.js"></script>
 <script>
   const TITLES_KEY = "madis-lists-titles";
   let customTitles = {};
@@ -217,10 +287,78 @@
     customTitles = {};
   }
 
+  function pushTitles(){
+    const json = JSON.stringify(customTitles);
+    if (window.MadiSync) MadiSync.push(TITLES_KEY, json);
+  }
+
+  function startTitlesSync(){
+    if (!window.MadiSync || !MadiSync.isEnabled()) return;
+    MadiSync.init(TITLES_KEY, (raw) => {
+      try { customTitles = JSON.parse(raw) || {}; } catch (e) { customTitles = {}; }
+      applyTitles();
+    });
+  }
+
+  function refreshSyncUI(){
+    const statusEl = document.getElementById("syncStatus");
+    const offEl = document.getElementById("syncOff");
+    const onEl = document.getElementById("syncOn");
+    const enabled = window.MadiSync && MadiSync.isEnabled();
+    if (enabled){
+      statusEl.textContent = "Synced — shared with any device using this code";
+      offEl.style.display = "none";
+      onEl.style.display = "block";
+      document.getElementById("syncCodeDisplay").textContent = MadiSync.getCode();
+    } else {
+      statusEl.textContent = "Not synced — data stays on this device only";
+      offEl.style.display = "block";
+      onEl.style.display = "none";
+    }
+  }
+
+  document.getElementById("syncEnableBtn").addEventListener("click", () => {
+    const errorEl = document.getElementById("syncEnableError");
+    if (!window.MadiSync){ errorEl.style.display = "block"; return; }
+    errorEl.style.display = "none";
+    const pasted = document.getElementById("syncCodeInput").value.trim();
+    const code = pasted || MadiSync.makeCode();
+    MadiSync.setCode(code);
+    refreshSyncUI();
+    startTitlesSync();
+  });
+
+  document.getElementById("syncCopyBtn").addEventListener("click", () => {
+    const code = document.getElementById("syncCodeDisplay").textContent;
+    const btn = document.getElementById("syncCopyBtn");
+    const orig = btn.textContent;
+    const reset = () => setTimeout(() => { btn.textContent = orig; }, 1500);
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(code).then(() => { btn.textContent = "Copied!"; reset(); }).catch(() => reset());
+    }
+  });
+
+  document.getElementById("syncDisableBtn").addEventListener("click", () => {
+    document.getElementById("syncDisableBtn").style.display = "none";
+    document.getElementById("syncDisableConfirm").style.display = "flex";
+  });
+  document.getElementById("syncDisableCancelBtn").addEventListener("click", () => {
+    document.getElementById("syncDisableConfirm").style.display = "none";
+    document.getElementById("syncDisableBtn").style.display = "block";
+  });
+  document.getElementById("syncDisableConfirmBtn").addEventListener("click", () => {
+    MadiSync.setCode("");
+    document.getElementById("syncDisableConfirm").style.display = "none";
+    document.getElementById("syncDisableBtn").style.display = "block";
+    refreshSyncUI();
+  });
+
   function applyTitles(){
     document.querySelectorAll(".link-name[data-key]").forEach(el => {
       const key = el.dataset.key;
-      if (customTitles[key]) el.textContent = customTitles[key];
+      const btn = document.querySelector(`.edit-title-btn[data-key="${key}"]`);
+      const defaultName = btn ? btn.dataset.default : el.textContent;
+      el.textContent = customTitles[key] || defaultName;
     });
   }
 
@@ -249,6 +387,7 @@
         customTitles[key] = val;
       }
       localStorage.setItem(TITLES_KEY, JSON.stringify(customTitles));
+      pushTitles();
 
       const newNameEl = document.createElement("div");
       newNameEl.className = "link-name";
@@ -275,6 +414,8 @@
   });
 
   applyTitles();
+  refreshSyncUI();
+  startTitlesSync();
 </script>
 
 </body>

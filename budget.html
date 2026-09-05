@@ -417,6 +417,7 @@
   </div>
 </div>
 
+<script src="sync.js"></script>
 <script>
 let data = {
   variable: { label:"Variable", emoji:"💗", envelopes: [] },
@@ -431,9 +432,8 @@ let activeFilter = "all";
 let totalIncome = 0;
 
 const STORAGE_KEY = "pocket-envelopes-state";
-(function loadState(){
+function loadState(raw){
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
     const saved = JSON.parse(raw);
     if (saved.data) data = saved.data;
@@ -441,11 +441,14 @@ const STORAGE_KEY = "pocket-envelopes-state";
   } catch (e) {
     console.error("Could not load saved data", e);
   }
-})();
+}
+loadState(localStorage.getItem(STORAGE_KEY));
 
 function saveState(){
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ data, totalIncome }));
+    const json = JSON.stringify({ data, totalIncome });
+    localStorage.setItem(STORAGE_KEY, json);
+    if (window.MadiSync) MadiSync.push(STORAGE_KEY, json);
   } catch (e) {
     console.error("Could not save data", e);
   }
@@ -718,6 +721,8 @@ document.getElementById("paycheckAmount").addEventListener("input", () => {
 });
 
 render();
+
+if (window.MadiSync) MadiSync.init(STORAGE_KEY, (raw) => { loadState(raw); render(); });
 </script>
 
 </body>

@@ -230,6 +230,7 @@
   </div>
 </div>
 
+<script src="sync.js"></script>
 <script>
 const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const MEALS = [
@@ -252,9 +253,8 @@ let menus = {};
 let groceries = [];
 
 const STORAGE_KEY = "meal-planner-state";
-(function loadState(){
+function loadState(raw){
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
     const saved = JSON.parse(raw);
     if (saved.menus) menus = saved.menus;
@@ -262,11 +262,14 @@ const STORAGE_KEY = "meal-planner-state";
   } catch (e) {
     console.error("Could not load saved data", e);
   }
-})();
+}
+loadState(localStorage.getItem(STORAGE_KEY));
 
 function saveState(){
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ menus, groceries }));
+    const json = JSON.stringify({ menus, groceries });
+    localStorage.setItem(STORAGE_KEY, json);
+    if (window.MadiSync) MadiSync.push(STORAGE_KEY, json);
   } catch (e) {
     console.error("Could not save data", e);
   }
@@ -408,6 +411,8 @@ document.getElementById("groceryInput").addEventListener("keydown", (e) => {
 
 renderWeekGrid();
 renderGroceryList();
+
+if (window.MadiSync) MadiSync.init(STORAGE_KEY, (raw) => { loadState(raw); renderWeekGrid(); renderGroceryList(); });
 </script>
 
 </body>

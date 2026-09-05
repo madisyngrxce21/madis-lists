@@ -399,6 +399,7 @@
   </div>
 </div>
 
+<script src="sync.js"></script>
 <script>
 const CATEGORIES = {
   kitchen:  { label:"Kitchen",      emoji:"🍽️" },
@@ -424,20 +425,22 @@ let activeFilter = "all";
 let activeItemId = null;
 
 const STORAGE_KEY = "florida-move-state";
-(function loadState(){
+function loadState(raw){
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
     const saved = JSON.parse(raw);
     if (Array.isArray(saved.items)) items = saved.items;
   } catch (e) {
     console.error("Could not load saved data", e);
   }
-})();
+}
+loadState(localStorage.getItem(STORAGE_KEY));
 
 function saveState(){
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ items }));
+    const json = JSON.stringify({ items });
+    localStorage.setItem(STORAGE_KEY, json);
+    if (window.MadiSync) MadiSync.push(STORAGE_KEY, json);
   } catch (e) {
     console.error("Could not save data", e);
   }
@@ -693,6 +696,8 @@ document.getElementById("addSaveBtn").addEventListener("click", () => {
 });
 
 render();
+
+if (window.MadiSync) MadiSync.init(STORAGE_KEY, (raw) => { loadState(raw); render(); });
 </script>
 
 </body>

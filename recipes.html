@@ -377,6 +377,7 @@
   </div>
 </div>
 
+<script src="sync.js"></script>
 <script>
 const CATEGORIES = {
   breakfast: { label:"Breakfast", emoji:"🥞" },
@@ -398,20 +399,22 @@ let activeFilter = "all";
 let activeRecipeId = null;
 
 const STORAGE_KEY = "recipe-box-state";
-(function loadState(){
+function loadState(raw){
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
     const saved = JSON.parse(raw);
     if (Array.isArray(saved.recipes)) recipes = saved.recipes;
   } catch (e) {
     console.error("Could not load saved data", e);
   }
-})();
+}
+loadState(localStorage.getItem(STORAGE_KEY));
 
 function saveState(){
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ recipes }));
+    const json = JSON.stringify({ recipes });
+    localStorage.setItem(STORAGE_KEY, json);
+    if (window.MadiSync) MadiSync.push(STORAGE_KEY, json);
   } catch (e) {
     console.error("Could not save data", e);
   }
@@ -619,6 +622,8 @@ document.getElementById("addSaveBtn").addEventListener("click", () => {
 });
 
 render();
+
+if (window.MadiSync) MadiSync.init(STORAGE_KEY, (raw) => { loadState(raw); render(); });
 </script>
 
 </body>

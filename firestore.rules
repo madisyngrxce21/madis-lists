@@ -1,0 +1,13 @@
+rules_version = '2';
+
+// Data lives at /syncs/{code}/state/{listKey}. There is no login system —
+// the "code" itself is the credential (a long random string only your
+// devices know), similar to an "anyone with this link" share. Requiring a
+// minimum length makes the code impractical to guess or brute-force.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /syncs/{code}/state/{listKey} {
+      allow read, write: if code is string && code.size() >= 16;
+    }
+  }
+}
