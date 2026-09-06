@@ -51,6 +51,9 @@
     --coral:#E8735A;
     --coral-dark:#B84E39;
     --coral-tint:#FBE3DC;
+    --sage:#7C9473;
+    --sage-dark:#577050;
+    --sage-tint:#E4EBE0;
     --shadow: 0 2px 4px rgba(58,15,39,0.04), 0 10px 24px -14px rgba(58,15,39,0.18);
   }
 
@@ -213,6 +216,7 @@
   .group-label.organization{ color:var(--mustard-dark); }
   .group-label.cleaning{ color:var(--periwinkle-dark); }
   .group-label.household{ color:var(--coral-dark); }
+  .group-label.pets{ color:var(--sage-dark); }
 
   .item-row{
     display:flex;
@@ -263,6 +267,7 @@
   .item-row.organization .item-emoji{ background:var(--mustard-tint); }
   .item-row.cleaning .item-emoji{ background:var(--periwinkle-tint); }
   .item-row.household .item-emoji{ background:var(--coral-tint); }
+  .item-row.pets .item-emoji{ background:var(--sage-tint); }
 
   .item-info{ flex:1; min-width:0; cursor:pointer; }
   .item-name{ font-weight:700; font-size:14px; }
@@ -479,6 +484,7 @@ const CATEGORIES = {
   organization: { label:"Organization", emoji:"🧺" },
   cleaning:     { label:"Cleaning",      emoji:"🧽" },
   household:    { label:"Household supplies", emoji:"🧻" },
+  pets:         { label:"Pets", emoji:"🐾" },
 };
 
 const colorMap = {
@@ -486,12 +492,14 @@ const colorMap = {
   bedroom:"var(--violet)", outdoor:"var(--green)", gameroom:"var(--plum)", misc:"var(--teal)",
   baking:"var(--cinnamon)", appliance:"var(--steel)",
   organization:"var(--mustard)", cleaning:"var(--periwinkle)", household:"var(--coral)",
+  pets:"var(--sage)",
 };
 const tintMap = {
   kitchen:"var(--pink-tint)", bathroom:"var(--sky-tint)", living:"var(--amber-tint)",
   bedroom:"var(--violet-tint)", outdoor:"var(--green-tint)", gameroom:"var(--plum-tint)", misc:"var(--teal-tint)",
   baking:"var(--cinnamon-tint)", appliance:"var(--steel-tint)",
   organization:"var(--mustard-tint)", cleaning:"var(--periwinkle-tint)", household:"var(--coral-tint)",
+  pets:"var(--sage-tint)",
 };
 
 let items = [];
