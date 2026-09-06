@@ -647,33 +647,43 @@ function lineTotal(item){
 }
 
 function render(){
-  let plannedTotal = 0, spentTotal = 0, boughtCount = 0;
+  // Grand totals for the top stat cards — always across every item.
+  let grandPlanned = 0, grandSpent = 0, grandBought = 0;
+  items.forEach(i => {
+    grandPlanned += lineTotal(i);
+    if (i.bought){
+      grandBought++;
+      grandSpent += lineTotal(i);
+    }
+  });
+  document.getElementById("statCount").textContent = items.length;
+  document.getElementById("statBought").textContent = grandBought;
+  document.getElementById("statPlanned").textContent = money(grandPlanned);
+  document.getElementById("statSpent").textContent = money(grandSpent);
+
+  // Panel totals — respect the priority-only toggle (and, below, the
+  // category filter) so the breakdown matches what's actually shown.
+  let plannedTotal = 0, spentTotal = 0;
   const catTotals = {};
+  const panelItems = priorityOnly ? items.filter(i => i.priority) : items;
 
   Object.keys(CATEGORIES).forEach(catKey => {
-    const catItems = items.filter(i => i.category === catKey);
+    const catItems = panelItems.filter(i => i.category === catKey);
     const planned = catItems.reduce((s,i)=>s+lineTotal(i),0);
     const spent = catItems.reduce((s,i)=>s + (i.bought ? lineTotal(i) : 0),0);
     catTotals[catKey] = { planned, spent };
     plannedTotal += planned;
   });
 
-  items.forEach(i => {
-    if (i.bought){
-      boughtCount++;
-      spentTotal += lineTotal(i);
-    }
+  panelItems.forEach(i => {
+    if (i.bought) spentTotal += lineTotal(i);
   });
-
-  document.getElementById("statCount").textContent = items.length;
-  document.getElementById("statBought").textContent = boughtCount;
-  document.getElementById("statPlanned").textContent = money(plannedTotal);
-  document.getElementById("statSpent").textContent = money(spentTotal);
 
   const track = document.getElementById("barTrack");
   track.innerHTML = "";
   const legendRow = document.getElementById("legendRow");
   const captionEl = document.getElementById("panelCaption");
+  const priorityPrefix = priorityOnly ? "priority items " : "";
 
   if (activeFilter !== "all" && catTotals[activeFilter]){
     const cat = CATEGORIES[activeFilter];
@@ -681,7 +691,7 @@ function render(){
     const catPlanned = catTotals[activeFilter].planned;
     document.getElementById("totalSpent").textContent = money(catSpent) + " spent";
     document.getElementById("totalPlanned").textContent = "of " + money(catPlanned);
-    captionEl.textContent = "in " + cat.label;
+    captionEl.textContent = priorityPrefix + "in " + cat.label;
 
     const pct = catPlanned > 0 ? Math.min(100, (catSpent / catPlanned) * 100) : 0;
     if (pct > 0){
@@ -695,7 +705,7 @@ function render(){
   } else {
     document.getElementById("totalSpent").textContent = money(spentTotal) + " spent";
     document.getElementById("totalPlanned").textContent = "of " + money(plannedTotal);
-    captionEl.textContent = "across every room";
+    captionEl.textContent = priorityPrefix + "across every room";
 
     Object.keys(catTotals).forEach(catKey => {
       const pct = plannedTotal > 0 ? (catTotals[catKey].planned / plannedTotal) * 100 : 0;
