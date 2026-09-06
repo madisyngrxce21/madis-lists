@@ -386,11 +386,14 @@
         <input class="field" type="number" step="0.01" placeholder="0.00" id="editPrice">
       </div>
       <div class="field-wrap">
-        <label class="field-label">Category</label>
-        <select class="field" id="editCategory"></select>
+        <label class="field-label">Quantity</label>
+        <input class="field" type="number" step="1" min="1" placeholder="1" id="editQuantity">
       </div>
     </div>
     <div class="error-text" id="editPriceError">Price can't be negative.</div>
+
+    <label class="field-label">Category</label>
+    <select class="field" id="editCategory"></select>
 
     <div class="btn-row">
       <button class="btn btn-danger" id="deleteBtn">Delete</button>
@@ -412,8 +415,16 @@
     <label class="field-label">Link (optional)</label>
     <input class="field" type="text" placeholder="https://..." id="newUrl">
 
-    <label class="field-label">Price</label>
-    <input class="field" type="number" step="0.01" placeholder="0.00" id="newPrice">
+    <div class="row2">
+      <div class="field-wrap">
+        <label class="field-label">Price</label>
+        <input class="field" type="number" step="0.01" placeholder="0.00" id="newPrice">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Quantity</label>
+        <input class="field" type="number" step="1" min="1" placeholder="1" id="newQuantity">
+      </div>
+    </div>
 
     <div class="error-text" id="newError">Give it a name at least.</div>
 
@@ -556,9 +567,13 @@ function renderItemList(){
       emojiBadge.className = "item-emoji";
       emojiBadge.textContent = CATEGORIES[catKey].emoji;
 
+      const qty = Number(item.quantity) || 1;
       const info = document.createElement("div");
       info.className = "item-info";
-      info.innerHTML = `<div class="item-name${item.bought ? " bought" : ""}">${nameHtml}</div>`;
+      info.innerHTML = `
+        <div class="item-name${item.bought ? " bought" : ""}">${nameHtml}</div>
+        ${qty > 1 ? `<div class="item-meta">Qty ${qty}${item.price ? " · " + money(item.price) + " each" : ""}</div>` : ""}
+      `;
       info.addEventListener("click", (e) => {
         if (e.target.tagName === "A") return;
         openEditSheet(item.id);
@@ -566,7 +581,7 @@ function renderItemList(){
 
       const amt = document.createElement("div");
       amt.className = "item-amt";
-      amt.textContent = item.price ? money(item.price) : "";
+      amt.textContent = item.price ? money(lineTotal(item)) : "";
 
       row.appendChild(check);
       row.appendChild(emojiBadge);
@@ -584,14 +599,18 @@ function renderItemList(){
   }
 }
 
+function lineTotal(item){
+  return (Number(item.price) || 0) * (Number(item.quantity) || 1);
+}
+
 function render(){
   let plannedTotal = 0, spentTotal = 0, boughtCount = 0;
   const catTotals = {};
 
   Object.keys(CATEGORIES).forEach(catKey => {
     const catItems = items.filter(i => i.category === catKey);
-    const planned = catItems.reduce((s,i)=>s+(Number(i.price)||0),0);
-    const spent = catItems.reduce((s,i)=>s + (i.bought ? (Number(i.price)||0) : 0),0);
+    const planned = catItems.reduce((s,i)=>s+lineTotal(i),0);
+    const spent = catItems.reduce((s,i)=>s + (i.bought ? lineTotal(i) : 0),0);
     catTotals[catKey] = { planned, spent };
     plannedTotal += planned;
   });
@@ -599,7 +618,7 @@ function render(){
   items.forEach(i => {
     if (i.bought){
       boughtCount++;
-      spentTotal += Number(i.price) || 0;
+      spentTotal += lineTotal(i);
     }
   });
 
@@ -674,6 +693,7 @@ function openEditSheet(itemId){
   document.getElementById("editName").value = item.name;
   document.getElementById("editUrl").value = item.url || "";
   document.getElementById("editPrice").value = item.price || "";
+  document.getElementById("editQuantity").value = item.quantity || 1;
   populateCategorySelect(document.getElementById("editCategory"), item.category);
   document.getElementById("editNameError").style.display = "none";
   document.getElementById("editPriceError").style.display = "none";
@@ -693,6 +713,7 @@ document.getElementById("saveEditBtn").addEventListener("click", () => {
   const name = document.getElementById("editName").value.trim();
   const url = document.getElementById("editUrl").value.trim();
   const price = parseFloat(document.getElementById("editPrice").value) || 0;
+  const quantity = Math.max(1, parseInt(document.getElementById("editQuantity").value) || 1);
   const category = document.getElementById("editCategory").value;
   const nameError = document.getElementById("editNameError");
   const priceError = document.getElementById("editPriceError");
@@ -706,6 +727,7 @@ document.getElementById("saveEditBtn").addEventListener("click", () => {
   item.name = name;
   item.url = url;
   item.price = Math.round(price * 100) / 100;
+  item.quantity = quantity;
   item.category = category;
   closeEditSheet();
   render();
@@ -722,6 +744,7 @@ document.getElementById("openAddBtn").addEventListener("click", () => {
   document.getElementById("newName").value = "";
   document.getElementById("newUrl").value = "";
   document.getElementById("newPrice").value = "";
+  document.getElementById("newQuantity").value = "1";
   document.getElementById("newError").style.display = "none";
   document.getElementById("addOverlay").classList.add("open");
 });
@@ -740,6 +763,7 @@ document.getElementById("addSaveBtn").addEventListener("click", () => {
   const name = document.getElementById("newName").value.trim();
   const url = document.getElementById("newUrl").value.trim();
   const price = parseFloat(document.getElementById("newPrice").value) || 0;
+  const quantity = Math.max(1, parseInt(document.getElementById("newQuantity").value) || 1);
   const errorEl = document.getElementById("newError");
 
   if (!name){
@@ -749,7 +773,7 @@ document.getElementById("addSaveBtn").addEventListener("click", () => {
   errorEl.style.display = "none";
 
   const id = category + "_" + Date.now();
-  items.unshift({ id, name, url, price: Math.round(price * 100) / 100, category, bought: false });
+  items.unshift({ id, name, url, price: Math.round(price * 100) / 100, quantity, category, bought: false });
   closeAddSheet();
   render();
 });
