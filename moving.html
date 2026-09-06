@@ -486,7 +486,7 @@ function renderLegend(catTotals){
     if (!catTotals[catKey] || catTotals[catKey].planned <= 0) return;
     const cat = CATEGORIES[catKey];
     const span = document.createElement("span");
-    span.innerHTML = `<span class="dot" style="background:${colorMap[catKey]}"></span>${cat.label}`;
+    span.innerHTML = `<span class="dot" style="background:${colorMap[catKey]}"></span>${cat.label} · ${money(catTotals[catKey].planned)}`;
     row.appendChild(span);
   });
 }
