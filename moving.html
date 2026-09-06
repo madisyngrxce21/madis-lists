@@ -36,6 +36,9 @@
     --sky:#3CA9D6;
     --sky-dark:#217CA3;
     --sky-tint:#DFF3FB;
+    --cinnamon:#B4703C;
+    --cinnamon-dark:#8A5228;
+    --cinnamon-tint:#F5E6D8;
     --shadow: 0 2px 4px rgba(58,15,39,0.04), 0 10px 24px -14px rgba(58,15,39,0.18);
   }
 
@@ -193,6 +196,7 @@
   .group-label.outdoor{ color:var(--green-dark); }
   .group-label.gameroom{ color:var(--plum-dark); }
   .group-label.misc{ color:var(--teal-dark); }
+  .group-label.baking{ color:var(--cinnamon-dark); }
 
   .item-row{
     display:flex;
@@ -224,6 +228,7 @@
   .item-row.outdoor .item-emoji{ background:var(--green-tint); }
   .item-row.gameroom .item-emoji{ background:var(--plum-tint); }
   .item-row.misc .item-emoji{ background:var(--teal-tint); }
+  .item-row.baking .item-emoji{ background:var(--cinnamon-tint); }
 
   .item-info{ flex:1; min-width:0; cursor:pointer; }
   .item-name{ font-weight:700; font-size:14px; }
@@ -409,15 +414,18 @@ const CATEGORIES = {
   outdoor:  { label:"Outdoor",      emoji:"🌴" },
   gameroom: { label:"Game room",    emoji:"🎮" },
   misc:     { label:"Misc",         emoji:"✨" },
+  baking:   { label:"Baking",       emoji:"🧁" },
 };
 
 const colorMap = {
   kitchen:"var(--pink)", bathroom:"var(--sky)", living:"var(--amber)",
   bedroom:"var(--violet)", outdoor:"var(--green)", gameroom:"var(--plum)", misc:"var(--teal)",
+  baking:"var(--cinnamon)",
 };
 const tintMap = {
   kitchen:"var(--pink-tint)", bathroom:"var(--sky-tint)", living:"var(--amber-tint)",
   bedroom:"var(--violet-tint)", outdoor:"var(--green-tint)", gameroom:"var(--plum-tint)", misc:"var(--teal-tint)",
+  baking:"var(--cinnamon-tint)",
 };
 
 let items = [];
