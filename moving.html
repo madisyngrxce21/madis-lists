@@ -335,7 +335,7 @@
       <span class="panel-big" id="totalSpent">$0.00 spent</span>
       <span class="panel-sub-right" id="totalPlanned">of $0.00</span>
     </div>
-    <p class="panel-caption">across every room</p>
+    <p class="panel-caption" id="panelCaption">across every room</p>
     <div class="bar-track" id="barTrack"></div>
     <div class="legend" id="legendRow"></div>
   </div>
@@ -565,7 +565,8 @@ function render(){
   Object.keys(CATEGORIES).forEach(catKey => {
     const catItems = items.filter(i => i.category === catKey);
     const planned = catItems.reduce((s,i)=>s+(Number(i.price)||0),0);
-    catTotals[catKey] = { planned };
+    const spent = catItems.reduce((s,i)=>s + (i.bought ? (Number(i.price)||0) : 0),0);
+    catTotals[catKey] = { planned, spent };
     plannedTotal += planned;
   });
 
@@ -581,22 +582,46 @@ function render(){
   document.getElementById("statPlanned").textContent = money(plannedTotal);
   document.getElementById("statSpent").textContent = money(spentTotal);
 
-  document.getElementById("totalSpent").textContent = money(spentTotal) + " spent";
-  document.getElementById("totalPlanned").textContent = "of " + money(plannedTotal);
-
   const track = document.getElementById("barTrack");
   track.innerHTML = "";
-  Object.keys(catTotals).forEach(catKey => {
-    const pct = plannedTotal > 0 ? (catTotals[catKey].planned / plannedTotal) * 100 : 0;
-    if (pct <= 0) return;
-    const seg = document.createElement("div");
-    seg.className = "bar-seg";
-    seg.style.width = pct + "%";
-    seg.style.background = colorMap[catKey];
-    track.appendChild(seg);
-  });
+  const legendRow = document.getElementById("legendRow");
+  const captionEl = document.getElementById("panelCaption");
 
-  renderLegend(catTotals);
+  if (activeFilter !== "all" && catTotals[activeFilter]){
+    const cat = CATEGORIES[activeFilter];
+    const catSpent = catTotals[activeFilter].spent;
+    const catPlanned = catTotals[activeFilter].planned;
+    document.getElementById("totalSpent").textContent = money(catSpent) + " spent";
+    document.getElementById("totalPlanned").textContent = "of " + money(catPlanned);
+    captionEl.textContent = "in " + cat.label;
+
+    const pct = catPlanned > 0 ? Math.min(100, (catSpent / catPlanned) * 100) : 0;
+    if (pct > 0){
+      const seg = document.createElement("div");
+      seg.className = "bar-seg";
+      seg.style.width = pct + "%";
+      seg.style.background = colorMap[activeFilter];
+      track.appendChild(seg);
+    }
+    legendRow.innerHTML = "";
+  } else {
+    document.getElementById("totalSpent").textContent = money(spentTotal) + " spent";
+    document.getElementById("totalPlanned").textContent = "of " + money(plannedTotal);
+    captionEl.textContent = "across every room";
+
+    Object.keys(catTotals).forEach(catKey => {
+      const pct = plannedTotal > 0 ? (catTotals[catKey].planned / plannedTotal) * 100 : 0;
+      if (pct <= 0) return;
+      const seg = document.createElement("div");
+      seg.className = "bar-seg";
+      seg.style.width = pct + "%";
+      seg.style.background = colorMap[catKey];
+      track.appendChild(seg);
+    });
+
+    renderLegend(catTotals);
+  }
+
   renderFilterRow();
   renderItemList();
   saveState();
