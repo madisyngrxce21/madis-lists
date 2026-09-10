@@ -103,10 +103,10 @@ body{margin:0;}
 
   </div>
 
-  <div style="display:{{ bottomBarDisplay }};align-items:stretch;justify-content:space-around;background:rgba(255,255,255,0.92);box-shadow:0 -3px 14px rgba(58,15,39,0.1);flex-shrink:0;overflow-x:auto;border-top:3px dashed #FDE4ED;border-radius:22px 22px 0 0;">
+  <div style="display:{{ bottomBarDisplay }};align-items:stretch;justify-content:space-between;background:rgba(255,255,255,0.92);box-shadow:0 -3px 14px rgba(58,15,39,0.1);flex-shrink:0;overflow-x:auto;border-top:3px dashed #FDE4ED;border-radius:16px 16px 0 0;">
     <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="8">
-      <div onClick="{{ item.onClick }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 10px;cursor:pointer;flex:1;min-width:56px;color:{{ item.mobileColor }};font-family:'Baloo 2',sans-serif;font-weight:700;font-size:10px;">
-        <span style="font-size:18px;border-radius:50%;background:{{ item.mobileBg }};padding:3px 7px;">{{ item.emoji }}</span>{{ item.label }}
+      <div onClick="{{ item.onClick }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:6px 2px;cursor:pointer;flex:1;min-width:0;color:{{ item.mobileColor }};font-family:'Baloo 2',sans-serif;font-weight:700;font-size:8.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+        <span style="font-size:15px;border-radius:50%;background:{{ item.mobileBg }};padding:2px 5px;">{{ item.emoji }}</span>{{ item.label }}
       </div>
     </sc-for>
   </div>
@@ -309,7 +309,9 @@ class Component extends DCLogic {
     const activeTab = this.state.activeTab;
     const isMobile = this.state.isMobile;
 
-    const shortLabels = { moving: 'Move list', budget: 'Envelopes', fitness: 'Plate tracker', reading: 'Reading', movies: 'Watchlist', recipes: 'Recipes', meals: 'Meal planner', baking: 'Baking' };
+    const shortLabels = isMobile
+      ? { moving: 'Moving', budget: 'Envelopes', fitness: 'Plate', reading: 'Reading', movies: 'Watchlist', recipes: 'Recipes', meals: 'Meals', baking: 'Baking' }
+      : { moving: 'Move list', budget: 'Envelopes', fitness: 'Plate tracker', reading: 'Reading', movies: 'Watchlist', recipes: 'Recipes', meals: 'Meal planner', baking: 'Baking' };
     const navItems = [{ key: 'home', emoji: '🏠', label: 'Home' }, ...this.tools.map(t => ({ key: t.key, emoji: t.emoji, label: shortLabels[t.key] || t.title }))]
       .map(item => {
         const active = activeTab === item.key;
@@ -357,10 +359,14 @@ class Component extends DCLogic {
       'Gingham': { image: 'repeating-linear-gradient(0deg, rgba(255,182,217,0.3) 0 14px, transparent 14px 28px), repeating-linear-gradient(90deg, rgba(255,182,217,0.3) 0 14px, transparent 14px 28px), linear-gradient(0deg,#FFF9FC,#FFF9FC)', size: '100% 100%, 100% 100%, 100% 100%', repeat: 'repeat, repeat, no-repeat', position: 'top left, top left, center' },
     };
     const bg = backgrounds[bgName] || backgrounds['Galaxy clouds'];
-    const frameInset = bg.framed ? (isMobile ? '5% 4% 5% 4%' : '9% 8% 9.5% 6.5%') : '0';
-    const frameBg = bg.framed ? 'rgba(250,245,255,0.58)' : 'transparent';
-    const frameShadow = bg.framed ? '0 10px 40px -12px rgba(20,10,40,0.45), 0 0 0 1px rgba(255,255,255,0.55)' : 'none';
-    const frameRadius = bg.framed ? '6px' : '0';
+    // The decorative "framed" picture-mat only makes sense with room to spare
+    // around it (desktop). On mobile it just eats screen space, so the app
+    // always goes full-bleed there regardless of which background is picked.
+    const framed = bg.framed && !isMobile;
+    const frameInset = framed ? '9% 8% 9.5% 6.5%' : '0';
+    const frameBg = framed ? 'rgba(250,245,255,0.58)' : 'transparent';
+    const frameShadow = framed ? '0 10px 40px -12px rgba(20,10,40,0.45), 0 0 0 1px rgba(255,255,255,0.55)' : 'none';
+    const frameRadius = framed ? '6px' : '0';
 
     return {
       navItems, homeCards, toolFrames, heroBadge,
