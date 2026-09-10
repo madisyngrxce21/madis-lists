@@ -8,7 +8,7 @@
   unavailable does it fall back to whatever was last cached — that's what
   makes the app usable with no signal.
 */
-const CACHE_NAME = "madis-lists-v1";
+const CACHE_NAME = "madis-lists-v2";
 const PRECACHE_URLS = [
   "./",
   "index.html",
@@ -23,6 +23,11 @@ const PRECACHE_URLS = [
   "manifest.json",
   "icon-192.png",
   "icon-512.png",
+  "Dashboard.dc.html",
+  "support.js",
+  "baking.html",
+  "assets/galaxy-clouds.jpg",
+  "assets/dreamy-sky.png",
 ];
 
 self.addEventListener("install", (event) => {

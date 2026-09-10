@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap">
+<script src="sync.js"></script>
+<style>
+body{margin:0;}
+@keyframes twinkle{0%,100%{opacity:.55;transform:scale(.85) rotate(0deg);}50%{opacity:1;transform:scale(1.15) rotate(10deg);}}
+@keyframes floatY{0%,100%{transform:translateY(0px);}50%{transform:translateY(-5px);}}
+</style>
+</helmet>
+
+<div style="height:100vh;width:100%;position:relative;background-image:{{ rootBgImage }};background-size:{{ rootBgSize }};background-repeat:{{ rootBgRepeat }};background-position:{{ rootBgPosition }};font-family:'Nunito',sans-serif;color:#3A2233;overflow:hidden;box-sizing:border-box;">
+
+ <div style="position:absolute;inset:{{ frameInset }};display:flex;flex-direction:{{ rootFlexDirection }};overflow:hidden;border-radius:{{ frameRadius }};background:{{ frameBg }};box-shadow:{{ frameShadow }};">
+
+  <div style="display:{{ sidebarDisplay }};flex-direction:column;width:210px;flex-shrink:0;background:rgba(255,255,255,0.88);padding:10px 12px;box-shadow:6px 0 20px rgba(58,15,39,0.08);overflow-y:auto;box-sizing:border-box;border-right:3px dashed #FDE4ED;">
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px;">
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(160deg,#E9D9FB,#F7C6DF);display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 0 0 2.5px #fff, 0 0 0 4.5px #EED9F2;">🎀</div>
+      <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:17px;color:#C43B78;">Madi's Lists</div>
+    </div>
+    <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="9">
+      <div onClick="{{ item.onClick }}" style="display:flex;align-items:center;gap:9px;padding:5px 12px;border-radius:999px;cursor:pointer;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:12.5px;margin-bottom:2px;background:{{ item.bg }};color:{{ item.color }};box-shadow:{{ item.shadow }};transform:scale({{ item.scale }});transition:all .15s ease;">
+        <span style="font-size:16px;">{{ item.emoji }}</span>{{ item.label }}
+        <sc-if value="{{ item.active }}" hint-placeholder-val="{{ false }}">
+          <span style="margin-left:auto;font-size:13px;">✨</span>
+        </sc-if>
+      </div>
+    </sc-for>
+    <div style="flex:1;"></div>
+    <div onClick="{{ openSyncModal }}" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;cursor:pointer;background:linear-gradient(135deg,#F7DEEC,#EDDCF7);color:#C43B78;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:12.5px;box-shadow:0 0 0 2px #fff, 0 0 0 4px #F3E2F1;margin-top:6px;">
+      <span style="width:8px;height:8px;border-radius:50%;background:{{ syncDot }};flex-shrink:0;"></span>🔄 Sync
+    </div>
+  </div>
+
+  <div style="display:{{ mobileHeaderDisplay }};align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(255,255,255,0.9);box-shadow:0 2px 8px rgba(58,15,39,0.06);flex-shrink:0;box-sizing:border-box;border-bottom:3px dashed #FDE4ED;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(160deg,#FFD9EA,#FFB6D9);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 0 0 2px #fff, 0 0 0 4px #FFD9EA;">🎀</div>
+      <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:17px;color:#F0407A;">Madi's Lists</div>
+    </div>
+    <div onClick="{{ openSyncModal }}" style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:#FDE4ED;color:#C22A5E;font-weight:700;font-size:12px;cursor:pointer;">
+      <span style="width:7px;height:7px;border-radius:50%;background:{{ syncDot }};"></span>🔄
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;min-height:0;">
+
+    <div style="display:{{ homeDisplay }};flex-direction:column;overflow-y:{{ homeOverflow }};padding:{{ homePadding }};box-sizing:border-box;flex:1;min-height:0;">
+      <div style="max-width:1180px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:12px;flex:1;min-height:0;">
+
+        <div style="background-image:radial-gradient(circle at 13px 13px, #FFF4F7 13px, transparent 14px), linear-gradient(120deg,#FFE3EF 0%,#FFF4DC 38%,#E9F8EF 72%,#EFE6FC 100%);background-size:26px 26px, 100% 100%;background-position:bottom left, center;background-repeat:repeat-x, no-repeat;border-radius:22px;padding:12px 18px 20px;box-shadow:0 10px 24px -14px rgba(58,15,39,0.22);position:relative;overflow:hidden;display:flex;align-items:center;gap:18px;flex-wrap:wrap;flex-shrink:0;">
+          <div style="flex:1;min-width:250px;">
+
+          <h1 style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;line-height:1.15;letter-spacing:-0.01em;margin:0 0 3px;color:#35204A;">Everything, all in one <span style="color:#F0407A;">cozy</span> <span style="color:#8A5FCF;">spot</span></h1>
+          <p style="color:#7A5C6E;font-size:12.5px;margin:0 0 10px;font-weight:700;">Every list you keep, checked in on all at once ⋆｡°✩</p>
+          <div style="display:inline-flex;align-items:center;gap:8px;background:#FFFFFF;color:#C22A5E;font-weight:700;font-size:12px;padding:7px 14px;border-radius:999px;box-shadow:0 0 0 2px #FFD3E4, 0 4px 10px -4px rgba(58,15,39,0.15);">{{ heroBadge }}</div>
+          </div>
+          <div style="position:relative;flex-shrink:0;animation:floatY 3.6s ease-in-out infinite;">
+            <div style="width:58px;height:58px;border-radius:50%;background:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 0 0 3px #FFD9EA, 0 0 0 7px rgba(255,255,255,0.75), 0 10px 18px -12px rgba(58,15,39,0.3);">🐶</div>
+            <span style="position:absolute;top:-5px;left:-4px;font-size:17px;transform:rotate(-14deg);">🎀</span>
+            <span style="position:absolute;bottom:0px;right:-2px;font-size:13px;animation:twinkle 2.4s ease-in-out infinite;">✨</span>
+          </div>
+          <span style="position:absolute;bottom:10px;right:26px;font-size:15px;transform:rotate(14deg);opacity:.75;">🐾</span>
+          <span style="position:absolute;bottom:22px;right:62px;font-size:13px;transform:rotate(-8deg);opacity:.6;">🐾</span>
+          <span style="position:absolute;bottom:8px;right:96px;font-size:11px;transform:rotate(20deg);opacity:.45;">🐾</span>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;margin:0 0 0 4px;flex-shrink:0;">
+          <span style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:16px;color:#3A0F27;">🐾 your lists</span>
+          <div style="flex:1;height:0;border-top:2.5px dotted #FFC7DE;"></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:{{ homeGridColumns }};grid-auto-rows:{{ homeGridRows }};gap:10px;flex:1;min-height:0;overflow-x:hidden;overflow-y:{{ homeOverflow }};padding:3px;box-sizing:border-box;">
+          <sc-for list="{{ homeCards }}" as="card" hint-placeholder-count="7">
+            <div onClick="{{ card.onClick }}" style="background:{{ card.cardBg }};border-radius:16px;padding:8px 10px 13px;box-shadow:0 0 0 2px #fff, 0 0 0 4px {{ card.ring }}, 0 10px 20px -14px rgba(58,15,39,0.25);cursor:pointer;display:flex;flex-direction:column;justify-content:center;position:relative;min-height:0;overflow:hidden;grid-column:{{ card.gridSpan }};transition:transform .18s ease;" style-hover="transform:translateY(-3px);">
+              <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+                <div style="width:30px;height:30px;border-radius:50%;background:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;box-shadow:0 0 0 2px {{ card.tint }}, 0 0 0 4px #FFFFFF;transform:rotate(-4deg);">{{ card.emoji }}</div>
+                <div style="min-width:0;flex:1;">
+                  <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:12.5px;line-height:1.2;color:#35204A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ card.title }}</div>
+                  <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:11.5px;line-height:1.25;color:{{ card.accent }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ card.line1 }}</div>
+                </div>
+                <div style="background:#FFFFFF;color:{{ card.accent }};font-family:'Baloo 2',sans-serif;font-weight:800;font-size:10.5px;padding:3px 9px;border-radius:999px;box-shadow:0 0 0 2px {{ card.tint }};flex-shrink:0;">{{ card.pctStr }}</div>
+              </div>
+              <div style="position:absolute;left:10px;right:10px;bottom:5px;height:4px;border-radius:999px;background:rgba(255,255,255,0.8);overflow:hidden;">
+                <div style="height:100%;border-radius:999px;background:{{ card.accent }};width:{{ card.pctStr }};"></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <sc-for list="{{ toolFrames }}" as="frame" hint-placeholder-count="7">
+      <iframe src="{{ frame.src }}" style="display:{{ frame.display }};width:100%;height:100%;border:none;flex:1;background:#FFFFFF;"></iframe>
+    </sc-for>
+
+  </div>
+
+  <div style="display:{{ bottomBarDisplay }};align-items:stretch;justify-content:space-around;background:rgba(255,255,255,0.92);box-shadow:0 -3px 14px rgba(58,15,39,0.1);flex-shrink:0;overflow-x:auto;border-top:3px dashed #FDE4ED;border-radius:22px 22px 0 0;">
+    <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="8">
+      <div onClick="{{ item.onClick }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 10px;cursor:pointer;flex:1;min-width:56px;color:{{ item.mobileColor }};font-family:'Baloo 2',sans-serif;font-weight:700;font-size:10px;">
+        <span style="font-size:18px;border-radius:50%;background:{{ item.mobileBg }};padding:3px 7px;">{{ item.emoji }}</span>{{ item.label }}
+      </div>
+    </sc-for>
+  </div>
+
+ </div>
+
+  <sc-if value="{{ syncModalOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeSyncModal }}" style="position:fixed;inset:0;background:rgba(58,15,39,0.35);display:flex;align-items:center;justify-content:center;z-index:50;">
+      <div onClick="{{ stopClick }}" style="background:#FFFFFF;border-radius:26px;padding:26px 24px;width:100%;max-width:380px;margin:16px;box-shadow:0 20px 50px rgba(58,15,39,0.25);box-sizing:border-box;border:2.5px dashed #FDE4ED;position:relative;">
+        <span style="position:absolute;top:-12px;right:22px;font-size:22px;">🎀</span>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <span style="font-size:20px;">🔄</span>
+          <div>
+            <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:16px;">Sync across devices</div>
+            <div style="font-size:12px;color:#9C7E92;font-weight:600;">{{ syncStatusText }}</div>
+          </div>
+        </div>
+        <sc-if value="{{ syncEnabled }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+            <code style="flex:1;background:#FFFBFD;border:1.5px solid #F6E3ED;border-radius:12px;padding:9px 10px;font-size:13px;font-weight:700;word-break:break-all;">{{ syncCode }}</code>
+            <button onClick="{{ copyCode }}" style="border:none;background:#FDE4ED;color:#C22A5E;border-radius:999px;padding:9px 14px;font-weight:700;font-size:12.5px;cursor:pointer;flex-shrink:0;font-family:'Baloo 2',sans-serif;">{{ copyLabel }}</button>
+          </div>
+          <p style="font-size:11.5px;color:#9C7E92;font-weight:600;margin:0 0 14px;">Enter this code on another device to connect it. Keep it private.</p>
+          <button onClick="{{ disableSync }}" style="width:100%;border:none;border-radius:999px;padding:11px;background:#FDE4ED;color:#C22A5E;font-weight:700;font-size:13px;cursor:pointer;font-family:'Baloo 2',sans-serif;">Turn off sync</button>
+        </sc-if>
+        <sc-if value="{{ syncEnabledFalse }}" hint-placeholder-val="{{ true }}">
+          <input value="{{ syncInputValue }}" onChange="{{ onSyncInputChange }}" placeholder="Paste a code from another device, or leave blank" style="width:100%;border:1.5px solid #F6E3ED;border-radius:14px;padding:10px 12px;font-size:13.5px;font-family:'Nunito',sans-serif;font-weight:600;background:#FFFBFD;margin-bottom:10px;box-sizing:border-box;" />
+          <button onClick="{{ enableSync }}" style="width:100%;border:none;border-radius:999px;padding:11px;background:linear-gradient(135deg,#F0407A,#FF6FA0);color:#FFFFFF;font-weight:700;font-size:13px;cursor:pointer;font-family:'Baloo 2',sans-serif;">Turn on sync</button>
+          <sc-if value="{{ syncError }}" hint-placeholder-val="{{ false }}">
+            <p style="color:#C43A3A;font-size:12px;margin-top:8px;font-weight:700;">Sync isn't available right now — try reloading the page.</p>
+          </sc-if>
+        </sc-if>
+        <button onClick="{{ closeSyncModal }}" style="width:100%;border:none;border-radius:999px;padding:10px;background:transparent;color:#9C7E92;font-weight:700;font-size:12.5px;cursor:pointer;margin-top:10px;font-family:'Baloo 2',sans-serif;">Close</button>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;background&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Galaxy clouds&quot;,&quot;Dreamy sky&quot;,&quot;Soft blush&quot;,&quot;Cream&quot;,&quot;Soft stripes&quot;,&quot;Tiny dots&quot;,&quot;Gingham&quot;],&quot;default&quot;:&quot;Galaxy clouds&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Look&quot;}}">
+class Component extends DCLogic {
+  state = {
+    activeTab: 'home', isMobile: false, syncModalOpen: false,
+    syncEnabled: false, syncCode: '', syncInputValue: '', syncError: false,
+    copied: false, reloadNonce: 0,
+  };
+
+  tools = [
+    { key: 'moving', file: 'moving.html', emoji: '🌴', title: "Florida move list", desc: 'Shopping list for the new place', tint: '#FBDDEA', accent: '#C43B78', ring: 'rgba(196,59,120,0.26)' },
+    { key: 'budget', file: 'budget.html', emoji: '💗', title: 'Pocket envelopes', desc: 'Budget tracker by envelope', tint: '#E8DEFA', accent: '#7A55C4', ring: 'rgba(122,85,196,0.26)' },
+    { key: 'fitness', file: 'fitness.html', emoji: '🍓', title: 'Plate tracker', desc: 'Calories, protein, weigh-ins', tint: '#D9F1EC', accent: '#1E8F84', ring: 'rgba(30,143,132,0.26)' },
+    { key: 'reading', file: 'reading.html', emoji: '📚', title: 'Reading tracker', desc: 'Shelf goals & ratings', tint: '#DCE6FA', accent: '#4F6FC0', ring: 'rgba(79,111,192,0.26)' },
+    { key: 'movies', file: 'movies.html', emoji: '🎬', title: 'Watchlist', desc: 'Movies and shows', tint: '#F0DEF7', accent: '#94469E', ring: 'rgba(148,70,158,0.26)' },
+    { key: 'recipes', file: 'recipes.html', emoji: '🍳', title: 'Recipe box', desc: 'Recipes to try', tint: '#FBE7D6', accent: '#B87220', ring: 'rgba(184,114,32,0.26)' },
+    { key: 'meals', file: 'meal-planner.html', emoji: '🍽️', title: 'Meal planner', desc: "This week's menu", tint: '#DDEFE4', accent: '#2E8C63', ring: 'rgba(46,140,99,0.26)' },
+    { key: 'baking', file: 'baking.html', emoji: '🧁', title: 'Baking ideas', desc: 'Cookies, cakes, and more', tint: '#F7DFEE', accent: '#B0508C', ring: 'rgba(176,80,140,0.26)' },
+  ];
+
+  componentDidMount() {
+    const enabled = window.MadiSync ? window.MadiSync.isEnabled() : false;
+    this.setState({ syncEnabled: enabled, syncCode: enabled ? window.MadiSync.getCode() : '' });
+    this.checkMobile();
+    this._resizeListener = () => this.checkMobile();
+    window.addEventListener('resize', this._resizeListener);
+    this._settleTimeout = setTimeout(() => this.checkMobile(), 150);
+    if (window.ResizeObserver) {
+      this._ro = new ResizeObserver(() => this.checkMobile());
+      this._ro.observe(document.documentElement);
+    }
+    this._interval = setInterval(() => {
+      this.checkMobile();
+      if (this.state.activeTab === 'home') this.forceUpdate();
+    }, 2000);
+  }
+
+  checkMobile() {
+    const isMobile = window.innerWidth <= 860;
+    if (isMobile !== this.state.isMobile) this.setState({ isMobile });
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._resizeListener);
+    if (this._ro) this._ro.disconnect();
+    clearTimeout(this._settleTimeout);
+    clearInterval(this._interval);
+  }
+
+  money(n) {
+    const v = Number(n) || 0;
+    return "$" + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  readJSON(key) {
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; }
+    catch (e) { return null; }
+  }
+  clampPct(n) { if (!isFinite(n) || n < 0) return 0; return Math.min(100, Math.round(n)); }
+
+  cardMoving() {
+    const data = this.readJSON('florida-move-state');
+    const items = (data && data.items) || [];
+    if (!items.length) return { line1: 'Nothing added yet', line2: 'Tap to start your list', pct: 0 };
+    const lineTotal = (i) => (Number(i.price) || 0) * (Number(i.quantity) || 1);
+    const total = items.length, bought = items.filter(i => i.bought).length;
+    const planned = items.reduce((s, i) => s + lineTotal(i), 0);
+    const spent = items.filter(i => i.bought).reduce((s, i) => s + lineTotal(i), 0);
+    return { line1: bought + ' of ' + total + ' bought', line2: this.money(spent) + ' of ' + this.money(planned) + ' spent', pct: this.clampPct(planned > 0 ? spent / planned * 100 : 0) };
+  }
+
+  cardBudget() {
+    const data = this.readJSON('pocket-envelopes-state');
+    if (!data || !data.data) return { line1: 'No envelopes yet', line2: 'Tap to set your budget', pct: 0 };
+    const cats = data.data; let grandSpent = 0, grandBudget = 0;
+    Object.keys(cats).forEach(k => { (cats[k].envelopes || []).forEach(e => { grandSpent += Number(e.spent) || 0; grandBudget += Number(e.budget) || 0; }); });
+    const income = Number(data.totalIncome) || 0;
+    const left = Math.max(income - grandBudget, 0);
+    return { line1: this.money(left) + ' left to assign', line2: this.money(grandSpent) + ' of ' + this.money(grandBudget) + ' spent', pct: this.clampPct(grandBudget > 0 ? grandSpent / grandBudget * 100 : 0) };
+  }
+
+  cardFitness() {
+    const data = this.readJSON('plate-tracker-state');
+    if (!data || !data.data) return { line1: 'Nothing logged today', line2: 'Tap to log your first meal', pct: 0 };
+    let cals = 0;
+    Object.keys(data.data).forEach(k => { (data.data[k].items || []).forEach(i => { cals += Number(i.calories) || 0; }); });
+    const goal = Number(data.dailyGoal) || 2000;
+    const weights = (data.weightEntries || []).slice().sort((a, b) => a.date.localeCompare(b.date));
+    const latest = weights[weights.length - 1];
+    return { line1: cals + ' of ' + goal + ' cal today', line2: latest ? latest.weight + ' lbs latest weigh-in' : 'No weigh-ins yet', pct: this.clampPct(goal > 0 ? cals / goal * 100 : 0) };
+  }
+
+  cardShelf(tool, storageKey) {
+    const data = this.readJSON(storageKey);
+    if (!data || !Array.isArray(data.books) || !data.books.length) return { line1: 'Nothing added yet', line2: 'Tap to start your list', pct: 0 };
+    const books = data.books;
+    const finished = books.filter(b => b.status === 'finished').length;
+    const inProgress = books.filter(b => b.status === 'reading');
+    const goal = Number(data.goal) || 0;
+    const verb = tool.key === 'movies' ? 'watched' : 'finished';
+    const line2 = inProgress.length ? (tool.key === 'movies' ? 'watching ' : 'reading ') + inProgress[0].title + (inProgress.length > 1 ? ' +' + (inProgress.length - 1) + ' more' : '') : 'Nothing in progress';
+    return { line1: finished + ' of ' + goal + ' ' + verb + ' this year', line2, pct: this.clampPct(goal > 0 ? finished / goal * 100 : 0) };
+  }
+
+  cardRecipes(storageKey) {
+    const data = this.readJSON(storageKey || 'recipe-box-state');
+    const recipes = (data && data.recipes) || [];
+    if (!recipes.length) return { line1: 'Box is empty', line2: 'Tap to add something', pct: 0 };
+    const made = recipes.filter(r => r.made).length;
+    return { line1: made + ' of ' + recipes.length + ' made', line2: (recipes.length - made) + ' left to try', pct: this.clampPct(recipes.length > 0 ? made / recipes.length * 100 : 0) };
+  }
+
+  cardMeals() {
+    const data = this.readJSON('meal-planner-state');
+    const groceries = (data && data.groceries) || [];
+    const menus = (data && data.menus) || {};
+    const left = groceries.filter(g => !g.got).length;
+    const d = new Date(); const day = (d.getDay() + 6) % 7;
+    const monday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - day);
+    const wk = monday.toISOString().slice(0, 10);
+    const dayNames = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+    const todayKey = dayNames[day];
+    const dinner = menus[wk] && menus[wk][todayKey] && menus[wk][todayKey].dinner;
+    const total = groceries.length;
+    const line1 = dinner ? 'Tonight: ' + dinner : 'No dinner planned yet';
+    const line2 = total ? left + ' grocery item' + (left !== 1 ? 's' : '') + ' left' : 'Grocery list is empty';
+    return { line1, line2, pct: this.clampPct(total > 0 ? ((total - left) / total) * 100 : 0) };
+  }
+
+  computeCard(tool) {
+    switch (tool.key) {
+      case 'moving': return this.cardMoving();
+      case 'budget': return this.cardBudget();
+      case 'fitness': return this.cardFitness();
+      case 'reading': return this.cardShelf(tool, 'reading-tracker-state');
+      case 'movies': return this.cardShelf(tool, 'watchlist-tracker-state');
+      case 'recipes': return this.cardRecipes('recipe-box-state');
+      case 'baking': return this.cardRecipes('baking-box-state');
+      case 'meals': return this.cardMeals();
+      default: return { line1: '', line2: '', pct: 0 };
+    }
+  }
+
+  handleEnableSync() {
+    if (!window.MadiSync) { this.setState({ syncError: true }); return; }
+    const pasted = (this.state.syncInputValue || '').trim();
+    const code = pasted || window.MadiSync.makeCode();
+    window.MadiSync.setCode(code);
+    this.setState({ syncEnabled: true, syncCode: code, syncError: false, syncInputValue: '', reloadNonce: this.state.reloadNonce + 1 });
+  }
+  handleDisableSync() {
+    if (window.MadiSync) window.MadiSync.setCode('');
+    this.setState({ syncEnabled: false, syncCode: '', reloadNonce: this.state.reloadNonce + 1 });
+  }
+  handleCopyCode() {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(this.state.syncCode);
+    this.setState({ copied: true });
+    setTimeout(() => this.setState({ copied: false }), 1500);
+  }
+
+  renderVals() {
+    const activeTab = this.state.activeTab;
+    const isMobile = this.state.isMobile;
+
+    const shortLabels = { moving: 'Move list', budget: 'Envelopes', fitness: 'Plate tracker', reading: 'Reading', movies: 'Watchlist', recipes: 'Recipes', meals: 'Meal planner', baking: 'Baking' };
+    const navItems = [{ key: 'home', emoji: '🏠', label: 'Home' }, ...this.tools.map(t => ({ key: t.key, emoji: t.emoji, label: shortLabels[t.key] || t.title }))]
+      .map(item => {
+        const active = activeTab === item.key;
+        return {
+          ...item, active,
+          bg: active ? 'linear-gradient(135deg,#C43B78,#9B5FD0)' : 'transparent',
+          color: active ? '#FFFFFF' : '#35204A',
+          shadow: active ? '0 0 0 2px #fff, 0 0 0 4px #EED9F2, 0 6px 14px -6px rgba(148,70,158,0.45)' : 'none',
+          scale: active ? '1.02' : '1',
+          mobileColor: active ? '#C43B78' : '#6B5378',
+          mobileBg: active ? '#F7DEEC' : 'transparent',
+          onClick: () => this.setState({ activeTab: item.key }),
+        };
+      });
+
+    let waiting = 0;
+    const homeCards = this.tools.map((t, i) => {
+      const c = this.computeCard(t);
+      const m = /^(\d+)/.exec(c.line2 || '');
+      if ((t.key === 'moving' || t.key === 'recipes' || t.key === 'meals') && m) waiting += Number(m[1]) || 0;
+      return {
+        key: t.key, emoji: t.emoji, title: t.title, desc: t.desc, tint: t.tint, accent: t.accent, ring: t.ring,
+        line1: c.line1, line2: c.line2, pctStr: (c.pct || 0) + '%',
+        cardBg: 'linear-gradient(150deg, ' + t.tint + ' 0%, rgba(255,255,255,0.9) 70%)',
+        gridSpan: 'span 1',
+        onClick: () => this.setState({ activeTab: t.key }),
+      };
+    });
+    const heroBadge = waiting > 0 ? '💌 ' + waiting + ' little thing' + (waiting !== 1 ? 's' : '') + ' waiting across your lists' : '✨ You\'re all caught up today!';
+
+    const toolFrames = this.tools.map(t => ({
+      key: t.key,
+      src: t.file + '?r=' + this.state.reloadNonce,
+      display: activeTab === t.key ? 'block' : 'none',
+    }));
+
+    const bgName = this.props.background || 'Galaxy clouds';
+    const backgrounds = {
+      'Galaxy clouds': { image: "url('assets/galaxy-clouds.jpg')", size: '100% 100%', repeat: 'no-repeat', position: 'center', framed: true },
+      'Dreamy sky': { image: "url('assets/dreamy-sky.png')", size: 'cover', repeat: 'no-repeat', position: 'center' },
+      'Soft blush': { image: 'linear-gradient(170deg,#FFF3F8 0%,#FFF8F1 100%)', size: '100% 100%', repeat: 'no-repeat', position: 'center' },
+      'Cream': { image: 'linear-gradient(170deg,#FFFBF4 0%,#FFF4EC 100%)', size: '100% 100%', repeat: 'no-repeat', position: 'center' },
+      'Soft stripes': { image: 'repeating-linear-gradient(90deg,#FFF6FA 0 24px,#FFEDF5 24px 48px)', size: '100% 100%', repeat: 'repeat', position: 'top left' },
+      'Tiny dots': { image: 'radial-gradient(circle, rgba(255,255,255,0.85) 2px, transparent 2.6px), linear-gradient(170deg,#FFEFF6,#FFF6EE)', size: '18px 18px, 100% 100%', repeat: 'repeat, no-repeat', position: 'top left, center' },
+      'Gingham': { image: 'repeating-linear-gradient(0deg, rgba(255,182,217,0.3) 0 14px, transparent 14px 28px), repeating-linear-gradient(90deg, rgba(255,182,217,0.3) 0 14px, transparent 14px 28px), linear-gradient(0deg,#FFF9FC,#FFF9FC)', size: '100% 100%, 100% 100%, 100% 100%', repeat: 'repeat, repeat, no-repeat', position: 'top left, top left, center' },
+    };
+    const bg = backgrounds[bgName] || backgrounds['Galaxy clouds'];
+    const frameInset = bg.framed ? (isMobile ? '5% 4% 5% 4%' : '9% 8% 9.5% 6.5%') : '0';
+    const frameBg = bg.framed ? 'rgba(250,245,255,0.58)' : 'transparent';
+    const frameShadow = bg.framed ? '0 10px 40px -12px rgba(20,10,40,0.45), 0 0 0 1px rgba(255,255,255,0.55)' : 'none';
+    const frameRadius = bg.framed ? '6px' : '0';
+
+    return {
+      navItems, homeCards, toolFrames, heroBadge,
+      rootBgImage: bg.image, rootBgSize: bg.size, rootBgRepeat: bg.repeat, rootBgPosition: bg.position,
+      frameInset, frameBg, frameShadow, frameRadius,
+      rootFlexDirection: isMobile ? 'column' : 'row',
+      sidebarDisplay: isMobile ? 'none' : 'flex',
+      mobileHeaderDisplay: isMobile ? 'flex' : 'none',
+      bottomBarDisplay: isMobile ? 'flex' : 'none',
+      homeDisplay: activeTab === 'home' ? 'flex' : 'none',
+      homePadding: isMobile ? '14px' : '20px 24px',
+      homeOverflow: isMobile ? 'auto' : 'hidden',
+      homeGridColumns: isMobile ? 'repeat(auto-fill,minmax(210px,1fr))' : 'repeat(2,minmax(0,1fr))',
+      homeGridRows: isMobile ? 'minmax(64px,auto)' : 'minmax(0,1fr)',
+      syncModalOpen: this.state.syncModalOpen,
+      syncEnabled: this.state.syncEnabled,
+      syncEnabledFalse: !this.state.syncEnabled,
+      syncCode: this.state.syncCode,
+      syncInputValue: this.state.syncInputValue,
+      syncError: this.state.syncError,
+      copyLabel: this.state.copied ? 'Copied!' : 'Copy',
+      syncStatusText: this.state.syncEnabled ? 'Synced across devices' : 'Not synced — this device only',
+      syncDot: this.state.syncEnabled ? '#39B383' : '#9C7E92',
+      openSyncModal: () => {
+        const enabled = window.MadiSync ? window.MadiSync.isEnabled() : false;
+        this.setState({ syncModalOpen: true, syncEnabled: enabled, syncCode: enabled ? window.MadiSync.getCode() : '', syncError: false });
+      },
+      closeSyncModal: () => this.setState({ syncModalOpen: false }),
+      stopClick: (e) => e.stopPropagation(),
+      onSyncInputChange: (e) => this.setState({ syncInputValue: e.target.value }),
+      enableSync: () => this.handleEnableSync(),
+      disableSync: () => this.handleDisableSync(),
+      copyCode: () => this.handleCopyCode(),
+    };
+  }
+}
+
+</script>
+</body>
+</html>
