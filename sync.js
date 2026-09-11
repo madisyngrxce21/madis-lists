@@ -114,31 +114,45 @@
             sendToFirestore(toSend);
           }
 
-          dbRef.onSnapshot(
-            (snap) => {
-              const isFirst = !gotFirstSnapshot;
-              gotFirstSnapshot = true;
-              // On the very first read, a local edit made while we were
-              // still connecting always wins over whatever the cloud
-              // already had — never let it clobber fresh work.
-              if (isFirst && editedBeforeConnected) return;
+          function reconcile(snap) {
+            const isFirst = !gotFirstSnapshot;
+            gotFirstSnapshot = true;
+            // On the very first read, a local edit made while we were
+            // still connecting always wins over whatever the cloud
+            // already had — never let it clobber fresh work.
+            if (isFirst && editedBeforeConnected) return;
 
-              const localJson = localStorage.getItem(storageKey);
+            const localJson = localStorage.getItem(storageKey);
 
-              if (!snap.exists) {
-                if (localJson) sendToFirestore(localJson);
-                return;
-              }
+            if (!snap.exists) {
+              if (localJson) sendToFirestore(localJson);
+              return;
+            }
 
-              const data = snap.data();
-              if (!data || typeof data.json !== "string") return;
-              if (data.json === lastPushedJson) return; // echo of our own write
-              if (data.json === localJson) return; // no actual change
-              localStorage.setItem(storageKey, data.json);
-              onRemoteChange(data.json);
-            },
-            (err) => console.error("MadiSync snapshot error", storageKey, err)
-          );
+            const data = snap.data();
+            if (!data || typeof data.json !== "string") return;
+            if (data.json === lastPushedJson) return; // echo of our own write
+            if (data.json === localJson) return; // no actual change
+            localStorage.setItem(storageKey, data.json);
+            onRemoteChange(data.json);
+          }
+
+          dbRef.onSnapshot(reconcile, (err) => console.error("MadiSync snapshot error", storageKey, err));
+
+          // A background/suspended tab's realtime listener can silently
+          // miss updates (mobile browsers throttle hidden tabs hard). If
+          // that happened, this page's in-memory state goes stale — and
+          // the next local save would otherwise push that stale state
+          // over whatever arrived while it was backgrounded. Re-check
+          // against the server (bypassing any local cache) the moment the
+          // tab becomes visible again, before trusting anything in memory.
+          document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState !== "visible") return;
+            dbRef
+              .get({ source: "server" })
+              .then(reconcile)
+              .catch((err) => console.error("MadiSync visibility refresh error", storageKey, err));
+          });
         })
         .catch((err) => console.error("MadiSync init error", storageKey, err));
     },
