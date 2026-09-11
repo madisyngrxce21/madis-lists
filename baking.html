@@ -285,6 +285,35 @@
   .field:focus{ outline:none; border-color:var(--pink); }
   textarea.field{ resize:vertical; min-height:72px; font-family:'Nunito',sans-serif; }
 
+  .view-notes{
+    white-space:pre-wrap;
+    font-size:14px;
+    line-height:1.55;
+    color:var(--ink);
+    background:#FFFBFD;
+    border:1.5px solid var(--line);
+    border-radius:14px;
+    padding:14px 16px;
+    margin-top:10px;
+    max-height:50vh;
+    overflow-y:auto;
+  }
+  .view-empty{ color:var(--muted); font-size:13.5px; font-weight:600; margin-top:10px; }
+  .view-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--pink-tint);
+    color:var(--pink-dark);
+    font-weight:700;
+    font-size:13px;
+    padding:9px 16px;
+    border-radius:999px;
+    text-decoration:none;
+    margin-top:14px;
+  }
+  .view-link:hover{ background:#F9D3E2; }
+
   .btn-row{ display:flex; gap:10px; margin-top:20px; }
   .btn{
     flex:1; border:none; border-radius:14px; padding:13px;
@@ -332,6 +361,28 @@
   </div>
 
   <div id="itemListWrap"></div>
+</div>
+
+<div class="overlay" id="viewOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="sheet-emoji" id="viewEmoji"></div>
+      <div>
+        <div class="sheet-title" id="viewTitle"></div>
+        <div class="sheet-sub" id="viewSub"></div>
+      </div>
+    </div>
+
+    <div class="view-notes" id="viewNotes" style="display:none;"></div>
+    <p class="view-empty" id="viewEmpty" style="display:none;">No notes saved for this one yet.</p>
+
+    <a class="view-link" id="viewLink" href="#" target="_blank" rel="noopener noreferrer" style="display:none;">🔗 Open original</a>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="viewCloseBtn">Close</button>
+      <button class="btn btn-primary" id="viewEditBtn">Edit</button>
+    </div>
+  </div>
 </div>
 
 <div class="overlay" id="editOverlay">
@@ -488,20 +539,13 @@ function renderItemList(){
       emojiBadge.className = "item-emoji";
       emojiBadge.textContent = CATEGORIES[catKey].emoji;
 
-      const nameHtml = recipe.url
-        ? `<a href="${recipe.url}" target="_blank" rel="noopener noreferrer">${recipe.name}</a>`
-        : recipe.name;
-
       const info = document.createElement("div");
       info.className = "item-info";
       info.innerHTML = `
-        <div class="item-name${recipe.made ? " made" : ""}">${nameHtml}</div>
+        <div class="item-name${recipe.made ? " made" : ""}">${recipe.name}</div>
         ${recipe.notes ? `<div class="item-meta">${recipe.notes}</div>` : ""}
       `;
-      info.addEventListener("click", (e) => {
-        if (e.target.tagName === "A") return;
-        openEditSheet(recipe.id);
-      });
+      info.addEventListener("click", () => openViewSheet(recipe.id));
 
       row.appendChild(check);
       row.appendChild(emojiBadge);
@@ -548,6 +592,49 @@ function populateCategorySelect(select, selected){
     select.appendChild(opt);
   });
 }
+
+function openViewSheet(recipeId){
+  activeRecipeId = recipeId;
+  const recipe = recipes.find(r => r.id === recipeId);
+  document.getElementById("viewEmoji").textContent = CATEGORIES[recipe.category].emoji;
+  document.getElementById("viewEmoji").style.background = tintMap[recipe.category];
+  document.getElementById("viewTitle").textContent = recipe.name;
+  document.getElementById("viewSub").textContent = CATEGORIES[recipe.category].label + (recipe.made ? " · Made it" : "");
+
+  const notesEl = document.getElementById("viewNotes");
+  const emptyEl = document.getElementById("viewEmpty");
+  if (recipe.notes){
+    notesEl.textContent = recipe.notes;
+    notesEl.style.display = "block";
+    emptyEl.style.display = "none";
+  } else {
+    notesEl.style.display = "none";
+    emptyEl.style.display = "block";
+  }
+
+  const linkEl = document.getElementById("viewLink");
+  if (recipe.url){
+    linkEl.href = recipe.url;
+    linkEl.style.display = "inline-flex";
+  } else {
+    linkEl.style.display = "none";
+  }
+
+  document.getElementById("viewOverlay").classList.add("open");
+}
+
+function closeViewSheet(){
+  document.getElementById("viewOverlay").classList.remove("open");
+}
+
+document.getElementById("viewOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "viewOverlay") closeViewSheet();
+});
+document.getElementById("viewCloseBtn").addEventListener("click", closeViewSheet);
+document.getElementById("viewEditBtn").addEventListener("click", () => {
+  closeViewSheet();
+  openEditSheet(activeRecipeId);
+});
 
 function openEditSheet(recipeId){
   activeRecipeId = recipeId;
