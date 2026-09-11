@@ -44,6 +44,9 @@
     --sky-dark:#217CA3;
     --sky-tint:#DFF3FB;
     --gold:#E8B90B;
+    --cinnamon:#B4703C;
+    --cinnamon-dark:#8A5228;
+    --cinnamon-tint:#F5E6D8;
     --shadow: 0 2px 4px rgba(58,15,39,0.04), 0 10px 24px -14px rgba(58,15,39,0.18);
   }
 
@@ -199,6 +202,7 @@
   .group-label.frosting{ color:var(--violet-dark); }
   .group-label.candy{ color:var(--teal-dark); }
   .group-label.misc{ color:var(--green-dark); }
+  .group-label.muffins{ color:var(--cinnamon-dark); }
 
   .item-row{
     display:flex;
@@ -230,6 +234,7 @@
   .item-row.frosting .item-emoji{ background:var(--violet-tint); }
   .item-row.candy .item-emoji{ background:var(--teal-tint); }
   .item-row.misc .item-emoji{ background:var(--green-tint); }
+  .item-row.muffins .item-emoji{ background:var(--cinnamon-tint); }
 
   .item-info{ flex:1; min-width:0; cursor:pointer; }
   .item-name{ font-weight:700; font-size:14px; }
@@ -394,11 +399,13 @@ const CATEGORIES = {
   frosting: { label:"Frosting", emoji:"🧁" },
   candy:    { label:"Candy",    emoji:"🍬" },
   misc:     { label:"Misc",     emoji:"✨" },
+  muffins:  { label:"Muffins",  emoji:"🫐" },
 };
 
 const tintMap = {
   cookies:"var(--amber-tint)", cakes:"var(--sky-tint)", bread:"var(--pink-tint)",
   pies:"var(--plum-tint)", frosting:"var(--violet-tint)", candy:"var(--teal-tint)", misc:"var(--green-tint)",
+  muffins:"var(--cinnamon-tint)",
 };
 
 let recipes = [];
